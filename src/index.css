@@ -1,2 +1,15 @@
 @import "tailwindcss";
+/* *{
+    background-color: black;
+} */
+ /* Protect Excalidraw UI from Tailwind's base reset */
+.excalidraw button {
+  background-color: revert !important;
+  border: revert !important;
+  color: revert !important;
+}
+.excalidraw input {
+  background-color: revert !important;
+}
+
 
