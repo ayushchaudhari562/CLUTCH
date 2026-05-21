@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "clutch-client",
   "private": true,
   "version": "0.0.0",
@@ -29,5 +30,9 @@
     "postcss": "^8.5.14",
     "tailwindcss": "^4.3.0",
     "vite": "^8.0.12"
+=======
+  "dependencies": {
+    "react-router-dom": "^7.15.1"
+>>>>>>> 70cc2bf (home and Studyswap)
   }
 }
