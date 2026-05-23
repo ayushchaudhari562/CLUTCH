@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import studyRoom from "./StudyRoom";
+import socket from "../socket/socket";
 
 const StudySwap = ({ swaps = [], addSwap }) => {
   // const [show, setShow] = useState("");
@@ -8,11 +9,59 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const [need, setNeed] = useState("");
   const [urgency, setUrgency] = useState("");
   const [dsa, setDsa] = useState("");
+  const [incomingRequest, setIncomingRequest] = useState(null);
+
+  //...
+  //.....
+  //it for second user when they click and user 1 
+  // got hint::or notification and email::;
+  //..
+  //..
+  useEffect(() => {
+    socket.on("incoming-match-request", (data) => {
+      setIncomingRequest(data);
+    });
+
+    socket.on("match-accepted", (roomId) => {
+      navigate(`/study-room?room=${roomId}`);
+    });
+    //for cleanup::
+    return () => {
+      socket.off("incoming-match-request");
+      socket.off("match-accepted");
+    };
+  }, [navigate]);
+  //.....
+  //..
+  ///..........
+
+
 
   const navigate = useNavigate();
 
+
+
+  //...
+  //../
+  //.......
+  const handleMatch = (swap) => {
+    socket.emit("request-match", {
+      targetSocketId: swap.socketId,
+      requesterSocketId: socket.id,
+      requesterName: "Users--requesting"
+    });
+    alert("Match request sent--//.......");
+  };
+  //.....
+  //..
+  //..
+
+
+
   const handlePost = (e) => {
-    e.preventDefault();
+    socketId: socket.id, //Saves the poster's phone number so we know who to call
+
+      e.preventDefault();
     if (!offer || !need) {
       alert("Please fill in both offer and need!");
       return;
@@ -140,10 +189,10 @@ const StudySwap = ({ swaps = [], addSwap }) => {
                         <p className="flex flex-col pt-1">
                           <span className="flex font-semibold text-red-600 uppercase text-xs tracking-wider gap-[250px]">
                             Seeking
-                             <button onClick={()=> navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
+                            <button onClick={() => navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
 
                           </span>
-                          
+
                           <span className="text-gray-700 mt-0.5">
                             {swap.need}
                           </span>
@@ -206,7 +255,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
                         <p className="flex flex-col pt-1">
                           <span className="flex font-semibold text-red-600 uppercase text-xs tracking-wider gap-[340px]">
                             Seeking
-                            <button onClick={()=> navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
+                            <button onClick={() => navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
 
                           </span>
                           <span className="text-gray-700 mt-0.5">
@@ -215,7 +264,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
                           </span>
                         </p>
                       </div>
-                      
+
                     </div>
                   </div>
                 ))}

@@ -33,7 +33,7 @@ const StudyRoom = () => {
 
     return () => {
       socket.off("receive-message", messageHandler);
-    }; {/*will use this to off entryy when its not receiving */}
+    }; {/*will use this to off entryy when its not receiving */ }
   }, []);
 
   const handleSendMessage = (e) => {
@@ -64,7 +64,7 @@ const StudyRoom = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button  className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
+          <button className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
 
           <button className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-gray-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -106,20 +106,19 @@ const StudyRoom = () => {
           </div>
           <div>
             <h3 className="text-sm font-bold text-gray-200">Ayush is speaking...</h3>
-            
+
           </div>
         </div>
         <span className="text-xs font-mono text-neutral-400 bg-neutral-800 px-2 py-1 rounded">42:18</span>
       </div>
-{/* from here the chatbox or convo part */}
+      {/* from here the chatbox or convo part */}
       <div className="flex-1 bg-[#1e1e1e] rounded-xl border border-neutral-800 shadow-md p-4 flex flex-col justify-between gap-4 min-h-[300px]">
         <div className="flex flex-col gap-3 overflow-y-auto max-h-[250px] pr-1">
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex flex-col gap-1 max-w-[85%] ${
-                msg.isMe ? "self-end" : "self-start"
-              }`}
+              className={`flex flex-col gap-1 max-w-[85%] ${msg.isMe ? "self-end" : "self-start"
+                }`}
             >
               {!msg.isMe && (
                 <span className="text-[11px] text-neutral-500 font-semibold px-1">
@@ -127,11 +126,10 @@ const StudyRoom = () => {
                 </span>
               )}
               <div
-                className={`p-3 text-sm shadow-sm leading-relaxed ${
-                  msg.isMe
+                className={`p-3 text-sm shadow-sm leading-relaxed ${msg.isMe
                     ? "bg-[#7c4dff] text-white rounded-2xl rounded-tr-none"
                     : "bg-[#292929] text-gray-100 rounded-2xl rounded-tl-none border border-neutral-800"
-                }`}
+                  }`}
               >
                 {msg.text}
               </div>
