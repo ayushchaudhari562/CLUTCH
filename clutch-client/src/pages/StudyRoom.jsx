@@ -1,19 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
+import socket from "../socket/socket";
 
 const StudyRoom = () => {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: "Ayush", text: "bro explain BCNF with example, 3NF I understood", isMe: false },
-    { id: 2, sender: "Sarthak", text: "ok bro I'll start", isMe: true }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem("studyroom_chat");
+    return saved ? JSON.parse(saved) : [{ id: 1, sender: "System", text: "Welcome to the study room!", isMe: false }];
+  });
   const [input, setInput] = useState("");
   const msfEndRef = useRef(null);
   const [showPopup, setShowPopup] = useState(true);
 
   useEffect(() => {
     msfEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    localStorage.setItem("studyroom_chat", JSON.stringify(messages));
   }, [messages]);
+
+  useEffect(() => {
+    socket.emit("join-room", "room1");
+
+    const messageHandler = (data) => {
+      if (typeof data === "string") {
+        setMessages((prev) => [...prev, { id: Date.now(), sender: "System", text: data, isMe: false }]);
+      } else {
+        const isMyMessage = data.senderId === socket.id;
+        setMessages((prev) => [...prev, { ...data, isMe: isMyMessage }]);
+      }
+    };
+
+    socket.on("receive-message", messageHandler);
+
+    return () => {
+      socket.off("receive-message", messageHandler);
+    }; {/*will use this to off entryy when its not receiving */}
+  }, []);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -21,11 +42,13 @@ const StudyRoom = () => {
 
     const newMessage = {
       id: Date.now(),
-      sender: "Sarthak",
+      sender: "User-" + (socket.id ? socket.id.substring(0, 4) : "0000"),
+      senderId: socket.id,
       text: input,
-      isMe: true
     };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    // Emit the message to the backend
+    socket.emit("send-message", { roomId: "room1", ...newMessage });
     setInput("");
   };
 
@@ -41,6 +64,8 @@ const StudyRoom = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <button  className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
+
           <button className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-gray-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
