@@ -10,8 +10,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const [urgency, setUrgency] = useState("");
   const [dsa, setDsa] = useState("");
   const [incomingRequest, setIncomingRequest] = useState(null);
-
-  //...
+  const navigate = useNavigate();
   //.....
   //it for second user when they click and user 1 
   // got hint::or notification and email::;
@@ -33,15 +32,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   }, [navigate]);
   //.....
   //..
-  ///..........
-
-
-
-  const navigate = useNavigate();
-
-
-
-  //...
+  ///..........  //...
   //../
   //.......
   const handleMatch = (swap) => {

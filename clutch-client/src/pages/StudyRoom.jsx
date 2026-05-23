@@ -20,14 +20,14 @@ const StudyRoom = () => {
   useEffect(() => {
     //..
     //....
-    // 1. Look at the web URL and grab whatever is after "?room="
+    //......Look at the web URL and grab whatever is after "?room="
     //..
     //....
     //..
     const searchParams = new URLSearchParams(window.location.search);
     const roomId = searchParams.get("room") || "room1"; // Fallback to room1 just in case
     
-    // 2. Join that specific dynamic room
+    // Join that specific dynamic room
     socket.emit("join-room", roomId);
 
     const messageHandler = (data) => {
