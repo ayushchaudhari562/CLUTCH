@@ -179,7 +179,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
                         <p className="flex flex-col pt-1">
                           <span className="flex font-semibold text-red-600 uppercase text-xs tracking-wider gap-[250px]">
                             Seeking
-                            <button onClick={() => navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
+                            <button onClick={() => handleMatch(swap)} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
 
                           </span>
 
@@ -245,7 +245,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
                         <p className="flex flex-col pt-1">
                           <span className="flex font-semibold text-red-600 uppercase text-xs tracking-wider gap-[340px]">
                             Seeking
-                            <button onClick={() => navigate('/study-room')} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
+                            <button onClick={() => handleMatch(swap)} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">Match</button>
 
                           </span>
                           <span className="text-gray-700 mt-0.5">
