@@ -18,7 +18,17 @@ const StudyRoom = () => {
   }, [messages]);
 
   useEffect(() => {
-    socket.emit("join-room", "room1");
+    //..
+    //....
+    // 1. Look at the web URL and grab whatever is after "?room="
+    //..
+    //....
+    //..
+    const searchParams = new URLSearchParams(window.location.search);
+    const roomId = searchParams.get("room") || "room1"; // Fallback to room1 just in case
+    
+    // 2. Join that specific dynamic room
+    socket.emit("join-room", roomId);
 
     const messageHandler = (data) => {
       if (typeof data === "string") {
@@ -47,8 +57,12 @@ const StudyRoom = () => {
       text: input,
     };
 
+    // Get the dynamic room ID here too
+    const searchParams = new URLSearchParams(window.location.search);
+    const roomId = searchParams.get("room") || "room1";
+
     // Emit the message to the backend
-    socket.emit("send-message", { roomId: "room1", ...newMessage });
+    socket.emit("send-message", { roomId: roomId, ...newMessage });
     setInput("");
   };
 

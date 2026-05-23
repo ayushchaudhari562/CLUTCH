@@ -59,9 +59,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
 
 
   const handlePost = (e) => {
-    socketId: socket.id, //Saves the poster's phone number so we know who to call
-
-      e.preventDefault();
+    e.preventDefault();
     if (!offer || !need) {
       alert("Please fill in both offer and need!");
       return;
@@ -82,6 +80,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
       need: need,
       urgency: urgencyMap[urgency] || "Flexible",
       category: dsa === "1" ? "skill" : "dsa",
+      socketId: socket.id, // Saves the poster's phone number so we know who to call
     };
 
     addSwap(newSwapObj);
@@ -272,6 +271,41 @@ const StudySwap = ({ swaps = [], addSwap }) => {
           )}
         </div>
       </div>
+
+      {/* The Match Request Popup */}
+      {incomingRequest && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-xl border border-neutral-800 max-w-sm w-full text-white">
+            <h3 className="text-xl font-bold mb-4">New Match Request!</h3>
+            
+            <p className="mb-6 text-gray-300">
+              <span className="font-semibold text-purple-400">{incomingRequest.requesterName}</span> wants to study with you.
+            </p>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIncomingRequest(null)}
+                className="flex-1 px-4 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-semibold"
+              >
+                Decline
+              </button>
+              
+              <button
+                onClick={() => {
+                  socket.emit("accept-match", {
+                    targetSocketId: socket.id,
+                    requesterSocketId: incomingRequest.requesterSocketId
+                  });
+                  setIncomingRequest(null);
+                }}
+                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-semibold"
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
