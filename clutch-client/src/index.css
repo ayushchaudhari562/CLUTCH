@@ -4,12 +4,11 @@
 } */
  /* Protect Excalidraw UI from Tailwind's base reset */
 .excalidraw button {
-  background-color: revert !important;
-  border: revert !important;
-  color: revert !important;
+  background-color: inherit;
+  border: inherit;
+  color: inherit;
 }
-.excalidraw input {
-  background-color: revert !important;
+/* restoring color BC colour kyun jaa rha  */
+.excalidraw .color-picker__swatch {
+  background-color: var(--swatch-color) !important;
 }
-
-

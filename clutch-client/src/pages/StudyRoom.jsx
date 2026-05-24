@@ -111,11 +111,21 @@ const StudyRoom = () => {
       text: input,
     };
 
-    // Get the dynamic room ID here too
+    //Get the dynamic room ID here too
+    //for diff room it will not store data ...in local
+    //...
+    //direct browser to browser connection
+    //....
+    //..
+    ///...
     const searchParams = new URLSearchParams(window.location.search);
     const roomId = searchParams.get("room") || "room1";
 
-    // Emit the message to the backend
+    //Emit the message to the backend
+    //from frontend to backend .........
+    //......
+    //...
+    //....
     socket.emit("send-message", { roomId: roomId, ...newMessage });
     setInput("");
   };
@@ -125,6 +135,12 @@ const StudyRoom = () => {
   //for ending call and clear chat history::
   //taking user back to main screen..
   //.......
+  //further i will make it to change and later 
+  // i will add it to 
+  //my or post sql
+  //....
+  //..
+  //...
   const handleEndCall = (e) => {
     e.preventDefault();
     localStorage.removeItem("studyroom_chat"); 
