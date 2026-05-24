@@ -11,6 +11,58 @@ const StudyRoom = () => {
   const [input, setInput] = useState("");
   const msfEndRef = useRef(null);
   const [showPopup, setShowPopup] = useState(true);
+  const [excalidrawAPI,setExcalidraw] = useState(null);
+  const isUpdatingFromSocket = useRef(false);
+  const debounceTimer = useRef(null);
+
+
+  useEffect(() => {
+    if (!excalidrawAPI) return; // Wait until Excalidraw is fully loaded
+    const handleExcalidrawUpdate = (elements) => {
+      //Mark that this update came from the network
+      isUpdatingFromSocket.current = true;
+      //Actually draw it on the screen
+      //...
+      //..
+      ///...
+      excalidrawAPI.updateScene({ elements });
+    };
+
+    socket.on("excalidraw-update", handleExcalidrawUpdate);
+
+    return () => {
+      socket.off("excalidraw-update", handleExcalidrawUpdate);
+    };
+  }, [excalidrawAPI]); 
+
+  //................
+  //.
+  //.........
+
+
+  const handleExcalidrawChange = (elements) => {
+    // Stop the infinite loop! If the network just updated us, don't send it back.
+    if (isUpdatingFromSocket.current) {
+      isUpdatingFromSocket.current = false;
+      return;
+    }
+    
+    // Smooth Debouncing (Wait 30ms before sending to avoid crashing the server)
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    
+    debounceTimer.current = setTimeout(() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const roomId = searchParams.get("room") || "room1";
+      
+      // Emit to the backend!
+      socket.emit("excalidraw-update", { roomId, elements });
+    }, 30); 
+  };
+
+
+//.....
+//..
+//....
 
   useEffect(() => {
     msfEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -66,10 +118,10 @@ const StudyRoom = () => {
     setInput("");
   };
   //...........
-  const handleEndCall = (e) => {
-    localStorage.removeItem();
-    target.e.
-  }
+  // const handleEndCall = (e) => {
+  //   localStorage.removeItem();
+  //   target.e.
+  // }
 
 
   return (
@@ -85,7 +137,7 @@ const StudyRoom = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleEndCall} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
+          <button onClick={() => {}} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
 
           <button className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-gray-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -114,7 +166,11 @@ const StudyRoom = () => {
 
       <div className="bg-[#1e1e1e] rounded-xl border border-neutral-800 shadow-md p-4 flex flex-col gap-4">
         <div className="h-[800px] w-full rounded-lg border border-neutral-800/80 overflow-hidden relative">
-          <Excalidraw theme="dark" />
+          <Excalidraw 
+            theme="dark" 
+            excalidrawAPI={(api) => setExcalidraw(api)}
+            onChange={handleExcalidrawChange}
+          />
         </div>
       </div>
 
