@@ -71,7 +71,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
       need: need,
       urgency: urgencyMap[urgency] || "Flexible",
       category: dsa === "1" ? "skill" : "dsa",
-      socketId: socket.id, // Saves the poster's phone number so we know who to call
+      socketId: socket.id, // Saves the poster's phone number so we know who to call for pop-now later will do email thing
     };
 
     addSwap(newSwapObj);
@@ -263,11 +263,14 @@ const StudySwap = ({ swaps = [], addSwap }) => {
         </div>
       </div>
 
+
+{/*......for pop-up..........*/}
+
       {/* The Match Request Popup */}
       {incomingRequest && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-xl border border-neutral-800 max-w-sm w-full text-white">
-            <h3 className="text-xl font-bold mb-4">New Match Request!</h3>
+            <h3 className="text-xl font-bold mb-4">New Match Request</h3>
             
             <p className="mb-6 text-gray-300">
               <span className="font-semibold text-purple-400">{incomingRequest.requesterName}</span> wants to study with you.
@@ -301,3 +304,4 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   );
 };
 export default StudySwap;
+ 

@@ -16,7 +16,7 @@ const StudyRoom = () => {
     msfEndRef.current?.scrollIntoView({ behavior: "smooth" });
     localStorage.setItem("studyroom_chat", JSON.stringify(messages));
   }, [messages]);
-//
+  //
   useEffect(() => {
     //..
     //....
@@ -25,8 +25,8 @@ const StudyRoom = () => {
     //....
     //..
     const searchParams = new URLSearchParams(window.location.search);
-    const roomId = searchParams.get("room") || "room1"; // Fallback to room1 just in case
-    
+    const roomId = searchParams.get("room") || "room1"; //Fallback to room1 just in case
+    //.........
     // Join that specific dynamic room
     socket.emit("join-room", roomId);
 
@@ -65,10 +65,17 @@ const StudyRoom = () => {
     socket.emit("send-message", { roomId: roomId, ...newMessage });
     setInput("");
   };
+  //...........
+  const handleEndCall = (e) => {
+    localStorage.removeItem();
+    target.e.
+  }
 
 
   return (
+    //.......
     <div className="min-h-screen bg-[#121212] text-white p-4 font-sans flex flex-col gap-4">
+
       <div className="flex justify-between items-center bg-[#1e1e1e] p-4 rounded-xl border border-neutral-800 shadow-md">
         <div className="flex items-center gap-3">
           <span className="h-3.5 w-3.5 bg-green-500 rounded-full animate-pulse"></span>
@@ -78,7 +85,7 @@ const StudyRoom = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
+          <button onClick={handleEndCall} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
 
           <button className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-gray-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -141,8 +148,8 @@ const StudyRoom = () => {
               )}
               <div
                 className={`p-3 text-sm shadow-sm leading-relaxed ${msg.isMe
-                    ? "bg-[#7c4dff] text-white rounded-2xl rounded-tr-none"
-                    : "bg-[#292929] text-gray-100 rounded-2xl rounded-tl-none border border-neutral-800"
+                  ? "bg-[#7c4dff] text-white rounded-2xl rounded-tr-none"
+                  : "bg-[#292929] text-gray-100 rounded-2xl rounded-tl-none border border-neutral-800"
                   }`}
               >
                 {msg.text}

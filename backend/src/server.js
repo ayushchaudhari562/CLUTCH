@@ -11,6 +11,7 @@ const io = new Server(server,{
 });
 
 require("./sockets/chatHandler")(io);
+require("./sockets/whiteboardHandler")(io);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
