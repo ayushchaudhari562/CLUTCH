@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import socket from "../socket/socket";
 
 const StudyRoom = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("studyroom_chat");
     return saved ? JSON.parse(saved) : [{ id: 1, sender: "System", text: "Welcome to the study room!", isMe: false }];
@@ -118,10 +120,17 @@ const StudyRoom = () => {
     setInput("");
   };
   //...........
-  // const handleEndCall = (e) => {
-  //   localStorage.removeItem();
-  //   target.e.
-  // }
+  //...........
+  //..
+  //for ending call and clear chat history::
+  //taking user back to main screen..
+  //.......
+  const handleEndCall = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("studyroom_chat"); 
+    navigate("/"); 
+  };
+  //.........
 
 
   return (
@@ -137,7 +146,7 @@ const StudyRoom = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => {}} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
+          <button onClick={handleEndCall} className="cursor-pointer  bg-purple-600 text-white text-xs px-6 py-3 rounded-full font-semibold shadow-sm">End-Call</button>
 
           <button className="p-2.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-gray-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
