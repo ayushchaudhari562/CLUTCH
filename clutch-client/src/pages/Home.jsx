@@ -25,6 +25,8 @@ const Home = ({swaps =[]}) => {
           <div className="bg-white shadow rounded-md p-3">
             College Rank: {session}
           </div>
+                    <button  className="cursor-pointer  bg-blue-300 text-red-600 text-xs px-6 py-3 rounded-full font-semibold shadow-sm">SOS</button>
+
         </div>
 
         <div>
