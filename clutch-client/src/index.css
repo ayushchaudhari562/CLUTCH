@@ -12,3 +12,7 @@
 .excalidraw .color-picker__swatch {
   background-color: var(--swatch-color) !important;
 }
+
+/* *{
+  background-image: url("../image/background-wall-concept-with-copy-space.jpg");
+} */

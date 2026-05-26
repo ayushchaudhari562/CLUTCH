@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import bgImg from "../image/background-wall-concept-with-copy-space.jpg"
 
 const Home = ({swaps =[]}) => {
   const [session, setSession] = useState(0);
@@ -7,7 +8,7 @@ const Home = ({swaps =[]}) => {
 
   return (
     <>
-      <div className="m-5 space-y-6">
+      <div className="m-5 space-y-6 bg-[url('bgImg')] h-screen w-full">
         <div className="flex items-center border-b border-amber-200 pb-2">
           <section className="text-lg font-semibold text-gray-700">
             Good Morning
