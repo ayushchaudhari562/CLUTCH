@@ -9,6 +9,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const [need, setNeed] = useState("");
   const [urgency, setUrgency] = useState("");
   const [dsa, setDsa] = useState("");
+  //incomingR is very imp concept keep revise it ..
   const [incomingRequest, setIncomingRequest] = useState(null);
   const navigate = useNavigate();
   //.....
@@ -16,6 +17,8 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   // got hint::or notification and email::;
   //..
   //..
+  //..mataching things..
+
   useEffect(() => {
     socket.on("incoming-match-request", (data) => {
       setIncomingRequest(data);
@@ -35,6 +38,9 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   ///..........  //...
   //../
   //.......
+
+  //..user SIDE who will click on match btn;
+  //..
   const handleMatch = (swap) => {
     socket.emit("request-match", {
       targetSocketId: swap.socketId,
@@ -48,7 +54,8 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   //..
 
 
-
+//..this is from selection.
+//..
   const handlePost = (e) => {
     e.preventDefault();
     if (!offer || !need) {
@@ -59,11 +66,13 @@ const StudySwap = ({ swaps = [], addSwap }) => {
       alert("Please select a swap category (Skill Swap or DSA Swap)!");
       return;
     }
-
+//...
+//..
+//......
     const urgencyMap = { 1: "Today", 2: "Tomorrow", 3: "Next Week" };
     const newSwapObj = {
       id: Date.now(),
-      name: "Sarthak Bihari",
+      name: "Sarthak Bihari..login System",
       college: "IIIT",
       year: "2nd",
       rating: "1.4⭐",
@@ -71,7 +80,10 @@ const StudySwap = ({ swaps = [], addSwap }) => {
       need: need,
       urgency: urgencyMap[urgency] || "Flexible",
       category: dsa === "1" ? "skill" : "dsa",
-      socketId: socket.id, // Saves the poster's phone number so we know who to call for pop-now later will do email thing
+      socketId: socket.id, 
+      //..
+      //Saves the poster's phone number 
+      //so we know who to call for pop-now later will do email thing
     };
 
     addSwap(newSwapObj);
@@ -265,7 +277,9 @@ const StudySwap = ({ swaps = [], addSwap }) => {
 
 
 {/*......for pop-up..........*/}
-
+{/* ///...
+/.........
+///.. */}
       {/* The Match Request Popup */}
       {incomingRequest && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">

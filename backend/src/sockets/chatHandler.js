@@ -5,6 +5,7 @@ module.exports = (io) => {
     socket.on("join-room", (roomId) => {
       socket.join(roomId);
       io.to(roomId).emit("receive-message", "A new user joined");
+      socket.to(roomId).emit("user-joined", socket.id);
     });
 
     socket.on("send-message", (data) => {
@@ -37,6 +38,28 @@ module.exports = (io) => {
       //...
       //..
     })
+
+    //for handling the webrtc offering and answering calls
+    //call feautre
+    socket.on("webrtc-offer",({roomId,offer,targetSocketId})=>{
+      if (targetSocketId) {
+        socket.to(targetSocketId).emit("webrtc-offer", { offer });
+      } else {
+        socket.to(roomId).emit("webrtc-offer",{offer});
+      }
+    });
+
+    socket.on("webrtc-answer",({roomId,answer})=>{
+      socket.to(roomId).emit("webrtc-answer",{answer})
+    });
+    
+    socket.on("webrtc-ice-candidate",({roomId,candidate})=>{
+      socket.to(roomId).emit("webrtc-ice-candidate",{candidate});
+    });
+
+    socket.on("reject-call", ({ targetSocketId }) => {
+      io.to(targetSocketId).emit("call-rejected");
+    });
 
     socket.on("disconnect", () => {
       console.log("User disconnected");
