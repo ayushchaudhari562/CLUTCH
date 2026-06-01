@@ -26,7 +26,7 @@ const Navbar = () => {
                     <NavLink to="/study-room" className={({ isActive }) => isActive ? "text-blue-400" : ""}>Study Room</NavLink>
                 </span>
                 <span>
-                    <NavLink to="/dsa-tracker" className={({ isActive }) => isActive ? "text-blue-400" : ""}>  Campus Feed </NavLink>
+                    <NavLink to="/Campus-feed" className={({ isActive }) => isActive ? "text-blue-400" : ""}>  Campus Feed </NavLink>
                 </span>
                 <span>
                     <NavLink to="/profile" className={({ isActive }) => isActive ? "text-blue-400" : ""}>Profile</NavLink>

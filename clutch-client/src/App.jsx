@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import StudySwap from './pages/StudySwap';
 import StudyRoom from './pages/StudyRoom';
 import Profile from './pages/Profile';
+import Campusd from './pages/Campus-Feed';
 
 const App = () => {
   const [swaps, setSwaps] = useState(() => {
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/' element={<Home swaps={swaps} />} />
           <Route path='/study-swap' element={<StudySwap swaps={swaps} addSwap={addSwap} />} />
           <Route path='/study-room' element={<StudyRoom />} />
+          <Route path='/campus-feed' element={<Campusd/>}/>
           <Route path='/profile' element ={<Profile/>}/>
         </Routes>
       </BrowserRouter>
