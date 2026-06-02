@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import FeedPost from '../components/campus-feed/Feed-post';
 
 const CampusFeed = () => {
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -114,8 +117,9 @@ const CampusFeed = () => {
                 AK
               </div>
               <div className="flex-1">
-                <div className="bg-[#141414] rounded-full px-4 py-2.5 text-gray-400 border border-[#2d2d2d] cursor-pointer hover:bg-[#1a1a1a] transition-colors">
-                  <input type="text" name="" id="" placeholder="What's on your mind?" />
+                <div  onClick={() => setIsPostModalOpen(true)}
+                      className="bg-[#141414] rounded-full px-4 py-2.5 text-gray-400 border border-[#2d2d2d] cursor-pointer hover:bg-[#1a1a1a] transition-colors">
+                  What's on your mind?
                 </div>
               </div>
             </div>
@@ -219,9 +223,9 @@ const CampusFeed = () => {
 
         {/* RIGHT COLUMN */}
         <div className="md:col-span-3 space-y-6">
-          {/* TRENDING TODAY */}
+          
           <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
-            <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">TRENDING TODAY</h2>
+            <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">RECENT</h2>
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <span className="text-gray-500 font-medium">1</span>
@@ -266,6 +270,7 @@ const CampusFeed = () => {
         </div>
 
       </div>
+      {isPostModalOpen && <FeedPost onClose={() => setIsPostModalOpen(false)} />}
     </div>
   );
 };
