@@ -55,4 +55,4 @@ const getAllPosts = async (req,res)=>{
     }
 };
 
-module.exports = { createPost };
+module.exports = { createPost,getAllPosts };
