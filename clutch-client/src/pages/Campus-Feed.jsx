@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,use} from "react";
 import FeedPost from '../components/campus-feed/Feed-post';
 
 const CampusFeed = () => {
