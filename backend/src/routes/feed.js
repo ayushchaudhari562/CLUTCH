@@ -7,6 +7,6 @@ const upload = require('../services/multer');
 // Use upload.single('image') where 'image' is 
 // the name of the form field sent from the frontend
 router.post('/create', upload.single('image'), createPost);
-
+router.get
 
 module.exports = router;
