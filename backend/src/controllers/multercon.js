@@ -40,7 +40,7 @@ const getAllPosts = async (req,res)=>{
         //me aur pdhana hai for now i only know that its 
         // make easier to without querey
         //..
-        const posts = await
+        const posts = await prisma
     }
 }
 
