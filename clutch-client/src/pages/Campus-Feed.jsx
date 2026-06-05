@@ -5,7 +5,7 @@ const CampusFeed = () => {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   //..
-  
+  //..
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
