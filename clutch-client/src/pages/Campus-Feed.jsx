@@ -4,6 +4,7 @@ import FeedPost from '../components/campus-feed/Feed-post';
 const CampusFeed = () => {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
+  //..
   
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans">
