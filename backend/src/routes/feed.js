@@ -9,4 +9,4 @@ const upload = require('../services/multer');
 router.post('/create', upload.single('image'), createPost);
 router.get('/all',getAllPosts);
 
-module.exports = router;
+module.exports = router; 
