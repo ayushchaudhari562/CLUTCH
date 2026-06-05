@@ -214,7 +214,7 @@ const CampusFeed = () => {
         </div>
 
         {/* RIGHT COLUMN */}
-        {/* <div className="md:col-span-3 space-y-6"> */}
+        <div className="md:col-span-3 space-y-6">
           
           <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
             <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">RECENT</h2>
