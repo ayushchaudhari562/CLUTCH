@@ -8,4 +8,5 @@ const upload = require('../services/multer');
 // the name of the form field sent from the frontend
 router.post('/create', upload.single('image'), createPost);
 
+
 module.exports = router;
