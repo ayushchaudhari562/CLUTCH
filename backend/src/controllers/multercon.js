@@ -44,6 +44,7 @@ const getAllPosts = async (req,res)=>{
             orderBy:{
                 createdAt : 'desc' //for newer to older;..     
             }
+            
         })
     }
 }
