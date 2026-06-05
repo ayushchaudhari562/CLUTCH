@@ -46,6 +46,7 @@ const getAllPosts = async (req,res)=>{
             }
 
         });
+        //sending post to the frontend;
         
     }
 }
