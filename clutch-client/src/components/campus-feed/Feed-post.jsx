@@ -100,7 +100,7 @@ const Feedpost = ({ onClose }) => {
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full bg-[#141414] text-gray-200 border border-[#2d2d2d] rounded-lg p-3 min-h-[200] focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                        className="w-full bg-[#141414] text-gray-200 border border-[#2d2d2d] rounded-lg p-3 min-h-[200%] focus:outline-none focus:border-purple-500 transition-colors resize-none"
                         placeholder="What's on your mind?"
                     ></textarea>
 
