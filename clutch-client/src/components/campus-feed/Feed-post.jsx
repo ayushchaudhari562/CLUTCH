@@ -75,7 +75,7 @@ const Feedpost = ({ onClose }) => {
                   event from traveling up to the parent elements." 
                   This ensures clicking inside the modal doesn't 
                   accidentally close it. */}
-            <div onClick={(e) => e.stopPropagation()} className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1c1c1c] z-50 p-6 rounded-xl border border-[#2d2d2d] w-full max-w-lg  shadow-2xl">
+            <div onClick={(e) => e.stopPropagation()} className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1c1c1c] z-50 p-6 rounded-xl border border-[#2d2d2d] w-full max-w-lg h- shadow-2xl">
                 <div className="flex justify-between items-center border-b border-gray-800 pb-3 mb-4">
                     <h3 className="text-lg font-semibold text-white">Create a Campus Post</h3>
                     
