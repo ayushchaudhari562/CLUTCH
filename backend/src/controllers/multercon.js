@@ -36,7 +36,7 @@ const getAllPosts = async (req,res)=>{
     try{
         //..
         //..
-        //
+        //telling prisma to find 
     }
 }
 
