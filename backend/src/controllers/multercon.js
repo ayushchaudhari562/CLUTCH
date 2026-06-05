@@ -37,7 +37,8 @@ const getAllPosts = async (req,res)=>{
         //..
         //..
         //telling prisma to find post from the database prisma ke baare 
-        //me aur pdhana hai for now i only know that its make easier to without querey
+        //me aur pdhana hai for now i only know that its 
+        // make easier to without querey
     }
 }
 
