@@ -50,7 +50,8 @@ const getAllPosts = async (req,res)=>{
         res.status(200).json(posts);
 
     }catch(error) {
-        console.error(error)
+        console.error(error);
+        
     }
 }
 
