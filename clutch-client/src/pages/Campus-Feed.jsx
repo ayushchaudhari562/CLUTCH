@@ -164,11 +164,54 @@ const CampusFeed = () => {
             </div>
           </div>
 
-          <div>
+                    {/* Dynamically Rendered Posts */}
+          <div className="space-y-6">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <div key={post.id} className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
+                <div className="flex gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
+                    U1
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-gray-100">{post.title}</h4> {/* <-- Dynamic Title */}
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-800/50">Post</span>
+                    </div>
+                    <div className="text-gray-400 text-xs mt-0.5">
+                       {new Date(post.createdAt).toLocaleDateString()} {/* <-- Dynamic Date */}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Image Rendering */}
+                {post.imageUrl && (
+                  <img 
+                    src={`http://localhost:5000${post.imageUrl}`} 
+                    alt="Post content" 
+                    className="w-full max-h-96 object-cover rounded-lg mb-4 border border-[#2d2d2d]"
+                  />
+                )}
+
+                {/* Content Rendering */}
+                <p className="text-gray-200 text-[15px] leading-relaxed font-medium mb-4">
+                  {post.content} {/* <-- Dynamic Content */}
+                </p>
+                
+                {/* Bottom Bar (Likes/Comments) */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2d2d2d]">
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <button className="text-gray-500 hover:text-indigo-400 p-1 rounded transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                      </button>
+                      <span className="text-gray-400 font-medium text-sm">0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
+
 
         {/* RIGHT COLUMN */}
         <div className="md:col-span-3 space-y-6">
