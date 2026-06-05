@@ -1,6 +1,9 @@
+const prisma = require('../prisma');
+
 const createPost = async (req, res) => {
     try {
-        const { title, content } = req.body;
+        // authorId is required by your schema!
+        const { title, content, authorId } = req.body;
         
         // If a file was uploaded, multer puts its details in req.file
         let imageUrl = null;
@@ -9,20 +12,19 @@ const createPost = async (req, res) => {
             imageUrl = `/uploads/${req.file.filename}`;
         }
 
-        // Example: Save to your database (Prisma)
-        /*
+        // Save to your database using Prisma
         const newPost = await prisma.post.create({
             data: {
                 title,
                 content,
-                imageUrl // Save the file path in the DB
+                imageUrl, // Save the file path in the DB
+                authorId: parseInt(authorId) || 1 // Fallback to 1 for testing if not provided
             }
         });
-        */
 
         res.status(201).json({ 
             message: "Post created successfully", 
-            post: { title, content, imageUrl } 
+            post: newPost
         });
     } catch (error) {
         console.error(error);
