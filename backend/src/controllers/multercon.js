@@ -41,7 +41,7 @@ const getAllPosts = async (req,res)=>{
         // make easier to without querey
         //..
         const posts = await prisma.post.findMany({
-            orderby
+            orderby:
         })
     }
 }
