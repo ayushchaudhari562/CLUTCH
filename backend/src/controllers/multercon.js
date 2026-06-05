@@ -32,6 +32,6 @@ const createPost = async (req, res) => {
     }
 };
 
-getAllPosts
+getAllPosts()
 
 module.exports = { createPost };
