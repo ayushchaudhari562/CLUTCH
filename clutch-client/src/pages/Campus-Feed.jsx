@@ -166,50 +166,7 @@ const CampusFeed = () => {
 
           <div>
             {posts.map((post) => (
-              <div className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
-                <div className="flex gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
-                    RS
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-gray-100">Rahul Sharma</h4>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-800/50">Doubt</span>
-                      <div className="flex items-center gap-1 text-gray-400 text-xs ml-auto bg-[#2d2d2d] px-2 py-1 rounded-full">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
-                        <span>IIIT Allahabad</span>
-                      </div>
-                    </div>
-                    <div className="text-gray-400 text-xs mt-0.5">
-                      3rd Year CSE • 12 mins ago
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-200 text-[15px] leading-relaxed font-medium mb-4">
-                  Can someone explain the difference between 2NF and 3NF with a real example? My DBMS viva is tomorrow and I keep getting confused between partial and transitive dependency 😭
-                </p>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2d2d2d]">
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <button className="text-indigo-400 hover:bg-indigo-400/10 p-1 rounded transition-colors">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                      </button>
-                      <span className="text-indigo-400 font-medium text-sm">24</span>
-                      <button className="text-gray-500 hover:text-gray-400 hover:bg-[#2d2d2d] p-1 rounded transition-colors">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                      </button>
-                    </div>
-                    <button className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                      <span className="text-sm">8 replies</span>
-                    </button>
-                  </div>
-                  <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors text-sm font-medium">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    Find Swap Partner
-                  </button>
-                </div>
-              </div>
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
 
