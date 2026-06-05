@@ -10,6 +10,7 @@ const CampusFeed = () => {
   //..
   const [posts,setPosts] = useState([]);
   ////..fetching post form db
+  //..
   
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans">
