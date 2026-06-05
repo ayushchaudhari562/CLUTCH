@@ -42,7 +42,7 @@ const getAllPosts = async (req,res)=>{
         //..
         const posts = await prisma.post.findMany({
             orderBy:{
-                createdAt : 'desc'      
+                createdAt : 'desc' //for newer to older;     
             }
         })
     }
