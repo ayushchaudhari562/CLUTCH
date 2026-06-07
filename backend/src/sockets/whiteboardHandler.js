@@ -9,6 +9,7 @@ module.exports = (io) => {
             //user a and b;
             //..
             //...
+            //just receive and send no store thing
         socket.on("excalidraw-update", (data) => {
             socket.broadcast.to(data.roomId).emit("excalidraw-update", data.elements)
         });

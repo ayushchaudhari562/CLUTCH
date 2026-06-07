@@ -15,7 +15,9 @@ const StudyRoom = () => {
 
   const [sidebarWidth, setSidebarWidth] = useState(320);
   const isDragging = useRef(false);
-
+// const {
+//   localStora
+// }
   const {
     localStream,
     remoteStream,
@@ -30,19 +32,19 @@ const StudyRoom = () => {
     rejectCall
   } = useWebRTC(roomId);
 
-  // this is for dragging ...
+  //this is for dragging ...
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging.current) return;
-      // Calculate width from the right side (minus padding of 12px)
+      //Calculate width from the right side (minus padding of 12px)
       const newWidth = window.innerWidth - e.clientX - 12;
-      // Restrict minimum and maximum width
+      //Restrict minimum and maximum width
       if (newWidth > 250 && newWidth < 800) {
         setSidebarWidth(newWidth);
       }
     };
-    //...
-    //..
+    //....
+    //....
     //....
 
     const handleMouseUp = () => {
@@ -111,7 +113,6 @@ const StudyRoom = () => {
 
       {/* Main Content Area */}
       <div className="flex gap-3 flex-1 overflow-hidden">
-        
         {/* Left Panel: Whiteboard */}
         <Whiteboard roomId={roomId} />
 

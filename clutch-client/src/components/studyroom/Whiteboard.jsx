@@ -6,7 +6,12 @@ const Whiteboard = ({ roomId }) => {
   const [excalidrawAPI, setExcalidraw] = useState(null);
   const isUpdatingFromSocket = useRef(false);
   const debounceTimer = useRef(null);
-
+///..
+//..
+// this useEffect is for reciveing data from person B
+//..
+//..
+//..
   useEffect(() => {
     if (!excalidrawAPI) return; // Wait until Excalidraw is fully loaded
 
@@ -35,7 +40,7 @@ const Whiteboard = ({ roomId }) => {
     debounceTimer.current = setTimeout(() => {
       // Emit to the backend!
       socket.emit("excalidraw-update", { roomId, elements });
-    }, 30);
+    }, 30);//ye imp hai for debugging
   };
 
   return (
