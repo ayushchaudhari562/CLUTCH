@@ -107,9 +107,11 @@ const Feedpost = ({ onClose }) => {
                     <div>
                         <label className="text-sm text-gray-400 block mb-1">Attach an Image</label>
                         <input 
+                        
                             type="file" 
                             accept="image/*"
                             onChange={(e) => setImage(e.target.files[0])}
+                            
                             className="text-gray-200 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-900/50 file:text-purple-300 hover:file:bg-purple-900/80 cursor-pointer"
                         />
                     </div>

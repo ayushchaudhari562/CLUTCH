@@ -13,7 +13,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const [incomingRequest, setIncomingRequest] = useState(null);
   const navigate = useNavigate();
   //.....
-  //it for second user when they click and user 1 
+  //it for sA user when they click and user 1 
   // got hint::or notification and email::;
   //..
   //..
