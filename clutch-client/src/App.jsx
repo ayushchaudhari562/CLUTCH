@@ -5,12 +5,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 
 
+
+
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import StudySwap from './pages/StudySwap';
 import StudyRoom from './pages/StudyRoom';
 import Profile from './pages/Profile';
 import Campusd from './pages/Campus-Feed';
+import Signin from './pages/Signin';
+import Signup from './pages/Signup';
 
 const App = () => {
   const [swaps, setSwaps] = useState(() => {
@@ -26,12 +30,16 @@ const App = () => {
     setSwaps([...swaps, newSwaps]);
   };
 
+
+
   return (
     <>
       <BrowserRouter>
         <Navbar />
         <Routes>
           <Route path='/' element={<Home swaps={swaps} />} />
+          <Route path='/signin' element={<Signin />} />
+          <Route path='/signup' element={<Signup />} />
           <Route path='/study-swap' element={<StudySwap swaps={swaps} addSwap={addSwap} />} />
           <Route path='/study-room' element={<StudyRoom />} />
           <Route path='/campus-feed' element={<Campusd/>}/>

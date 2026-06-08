@@ -1,9 +1,8 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
-
+import { NavLink } from "react-router-dom";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
-
 
     return(
         <>
@@ -30,6 +29,20 @@ const Navbar = () => {
                 </span>
                 <span>
                     <NavLink to="/profile" className={({ isActive }) => isActive ? "text-blue-400" : ""}>Profile</NavLink>
+                </span>
+                
+                {/* Sign In / Log Out Button Section */}
+                <span className="ml-4 flex items-center">
+                    <SignedIn>
+                        <UserButton afterSignOutUrl="/" />
+                    </SignedIn>
+                    <SignedOut>
+                        <SignInButton mode="modal">
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded font-bold transition-colors">
+                                Sign In / Up
+                            </button>
+                        </SignInButton>
+                    </SignedOut>
                 </span>
             </section>
         </div>
