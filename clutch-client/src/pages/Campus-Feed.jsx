@@ -21,15 +21,16 @@ const CampusFeed = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-const url = selectedCollegeId 
+        const url = selectedCollegeId 
             ? `http://localhost:5000/api/feed/all?collegeId=${selectedCollegeId}` 
             : `http://localhost:5000/api/feed/all`;
                     
-            fetch(url).then(res => res.json()).then(data =>{
-              setPosts(data.post); //foe now saving this post here also i can optimzation;
-              setSidebarColleges(data.topColleges); //sidebar save krne ke liye
-
-            })
+        fetch(url)// i will add comment later here ig i need more change here y
+            .then(res => res.json())
+            .then(data => {
+                setPosts(data.posts || []); 
+                setSidebarColleges(data.topColleges || []); 
+            });
       } catch (error) {
         console.error("Failed to fetch posts:", error);
       }
@@ -44,52 +45,38 @@ const url = selectedCollegeId
         {/* LEFT COLUMN */}
         <div className="md:col-span-3 space-y-6">
           {/* FILTER */}
-          <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
-            <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-3">FILTER</h2>
-            <ul className="space-y-1">
-              {/* Active Item */}
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="text-red-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg> */}
-                  </div>
-                  <span className="font-medium text-gray-300"></span>
-                </div>
-                <span className="text-gray-400 text-sm">23</span>
-              </li>
-              
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="text-red-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg> */}
-                  </div>
-                  <span className="font-medium text-gray-300">Rants</span>
-                </div>
-                <span className="text-gray-400 text-sm">23</span>
-              </li>
-            </ul>
-          </div>
+          
 
           {/* COLLEGE */}
           <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
             <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-3">COLLEGE</h2>
             <ul className="space-y-1">
-               <li className="flex items-center justify-between bg-[#2d2d2d] px-3 py-2 rounded-lg cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="text-indigo-400">
-                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
-                  </div>
-                  <span className="font-medium">My College</span>
-                </div>
-              </li>
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
+              <li 
+                onClick={() => setSelectedCollegeId(null)}
+                className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${selectedCollegeId === null ? 'bg-[#2d2d2d]' : 'hover:bg-[#252525]'}`}
+              >
                 <div className="flex items-center gap-3">
                   <div className="text-blue-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
                   </div>
-                  <span className="font-medium text-gray-300">All Colleges</span>
+                  <span className="font-medium text-gray-300">Global Feed</span>
                 </div>
               </li>
+
+              {sidebarColleges.map((college) => (
+                <li 
+                  key={college.id}
+                  onClick={() => setSelectedCollegeId(college.id)}
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${selectedCollegeId === college.id ? 'bg-[#2d2d2d] text-white' : 'hover:bg-[#252525] text-gray-300'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="text-indigo-400">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                    </div>
+                    <span className="font-medium">{college.name}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -99,12 +86,12 @@ const url = selectedCollegeId
           
           {/* AI Campus Pulse */}
           <div className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
-            <div className="flex items-center gap-2 mb-3">
+            {/* <div className="flex items-center gap-2 mb-3">
               <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
               <h3 className="text-purple-400 font-semibold">AI Campus Pulse</h3>
-            </div>
+            </div> */}
             <p className="text-gray-300 leading-relaxed text-[15px]">
-              Today's hot topics: DBMS viva prep, Amazon internship applications open, and a heated debate about the new attendance policy. 3 doubts solved via Study Swap today.
+              Today's hot topics: leeeooo DBMS viva prep, Amazon internship applications open, and a heated debate about the new attendance policy. 3 doubts solved via Study Swap today.
             </p>
           </div>
 

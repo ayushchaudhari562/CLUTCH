@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/clerk-react';
 import React, { useState } from 'react';
 
 const Feedpost = ({ onClose }) => {
@@ -5,6 +6,10 @@ const Feedpost = ({ onClose }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     
+
+    //..
+    //..
+    const {user} = useUser();
     // State to store the uploaded image file (Multer needs a File object)
     const [image, setImage] = useState(null);
     
@@ -25,7 +30,11 @@ const Feedpost = ({ onClose }) => {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('content', content);
-            
+            //...
+            //..
+            if(user){
+                formData.append('clerkId',user.id);
+            }
             // If the user selected an image, append it to FormData.
             // 'image' must exactly match the field name expected by upload.single('image') in your backend route.
             if (image) {
