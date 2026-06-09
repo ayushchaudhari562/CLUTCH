@@ -21,10 +21,12 @@ model Post {
 
 model User {
   id            Int      @id @default(autoincrement())
+  clerkId       String?  @unique
   username      String   @unique
   email         String   @unique
   passwordHash  String
   fullName      String?
+  collegeName   String?            
   bio           String?
   profileImage  String?
   createdAt     DateTime @default(now())
@@ -32,6 +34,7 @@ model User {
   likes         Like[]
   comments      Comment[]
 }
+
 
 model Like {
   id        Int      @id @default(autoincrement())
@@ -52,4 +55,9 @@ model Comment {
   createdAt DateTime @default(now())
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Colleges{
+   id       Int     @id
+   name     String  @unique
 }

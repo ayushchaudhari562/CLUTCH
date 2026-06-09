@@ -37,7 +37,7 @@ const Navbar = () => {
                         <UserButton afterSignOutUrl="/" />
                     </SignedIn>
                     <SignedOut>
-                        <SignInButton mode="modal">
+                        <SignInButton mode="modal" forceRedirectUrl="/onboarding">
                             <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded font-bold transition-colors">
                                 Sign In / Up
                             </button>
