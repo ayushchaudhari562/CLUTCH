@@ -35,52 +35,16 @@ const CampusFeed = () => {
             <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-3">FILTER</h2>
             <ul className="space-y-1">
               {/* Active Item */}
-              <li className="flex items-center justify-between bg-[#2d2d2d] px-3 py-2 rounded-lg cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="text-purple-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg> */}
-                  </div>
-                  <span className="font-medium">NIT baddies aka Jalandhar</span>
-                </div>
-                <span className="text-gray-400 text-sm">48</span>
-              </li>
-              {/* Other Items... */}
               <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="text-blue-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> */}
+                  <div className="text-red-400">
+                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg> */}
                   </div>
-                  <span className="font-medium text-gray-300">IIT Indore</span>
+                  <span className="font-medium text-gray-300"></span>
                 </div>
-                <span className="text-gray-400 text-sm">84</span>
+                <span className="text-gray-400 text-sm">23</span>
               </li>
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="text-cyan-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> */}
-                  </div>
-                  <span className="font-medium text-gray-300">IIIT Nagpur</span>
-                </div>
-                <span className="text-gray-400 text-sm">61</span>
-              </li>
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="text-indigo-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> */}
-                  </div>
-                  <span className="font-medium text-gray-300">IIIT Gwalior</span>
-                </div>
-                <span className="text-gray-400 text-sm">43</span>
-              </li>
-              <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="text-pink-400">
-                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> */}
-                  </div>
-                  <span className="font-medium text-gray-300">IIT BHU</span>
-                </div>
-                <span className="text-gray-400 text-sm">37</span>
-              </li>
+              
               <li className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-[#252525] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="text-red-400">

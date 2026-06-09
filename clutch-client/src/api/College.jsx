@@ -2,87 +2,103 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
+
 const CollegeSelector = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     
+    // ...
+    // search variable mein hum wo store karte hain jo user type karta hai
+    // ...
     const [search, setSearch] = useState("");
-    const [allColleges, setAllColleges] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    // ==========================================
-    // DEBUGGING LESSON: WHY THE SCREEN WAS BLANK
-    // ==========================================
-    // 1. Vite parsing error: We initially named this file 'College.js'. Vite requires files with HTML/JSX to be named '.jsx', so it threw a parse error.
-    // 2. React Runtime Crash: The 'indian-colleges' package's function was called 'getAllColleges()', not 'getColleges()'. Calling a non-existent function crashed React.
-    // 3. Array Format Crash: We tried to use `college.name.toLowerCase()`, but the package returned an array of Strings, not Objects. Calling `.name` on a string returns undefined, which crashed the app.
-    // 4. Vite Silent Hang (Blank Screen): The 'indian-colleges' NPM package imports a massive 8MB JSON file synchronously. When Vite tried to bundle it, it silently choked and halted execution in the browser.
-    // 
-    // THE FIX: We uninstalled the NPM package and placed 'colleges.json' in the 'public' folder. 
-    // Now, we use a `useEffect` to fetch the data asynchronously. This takes the load off the Vite compiler and stops the browser from freezing!
+    // ...
+    // allColleges mein hum database se aayi hui colleges ki list store karte hain
+    // ...
+    const [allColleges, setAllColleges] = useState([]);
+
+    // ...
+    // isLoading se hum 'Loading...' message dikhate hain jab backend se data aa raha ho
+    // ...
+    const [isLoading, setIsLoading] = useState(false);
+
+    // ...
+    // useEffect tab run hota hai jab bhi 'search' variable change hota hai (yaani jab user kuch type karta hai)
+    // ...
+
     useEffect(() => {
-        fetch('/colleges.json')
+        setIsLoading(true);
+
+        // ...
+        // Step 1: Hum apne Express backend ko bol rahe hain: "Bhai, jo search query hai uske matching colleges de do"
+        // ...
+        fetch(`http://localhost:5000/api/colleges?search=${search}`)
             .then(res => res.json())
             .then(data => {
-                const collegeNames = data.map(item => item.college);
-                setAllColleges(collegeNames);
-                setIsLoading(false);
+                // ...
+                // Step 2: Backend ne Prisma se colleges dhoondh kar yahan 'data' mein bhej diye hain
+                // ...
+                setAllColleges(data); // List update ho gayi
+                setIsLoading(false); // Loading message hata do
             })
             .catch(err => {
-                console.error("Error loading colleges:", err);
+                console.error("Error fetching colleges from backend:", err);
                 setIsLoading(false);
             });
-    }, []);
-
-    // Filter the fetched colleges based on the search bar input.
-    // Notice how we use `typeof college === 'string'` as a safety check so that bad data doesn't crash the loop.
-    const filteredColleges = allColleges.filter(college => 
-        college && typeof college === 'string' && college.toLowerCase().includes(search.toLowerCase())
-    ).slice(0, 50);  
+    }, [search]); // <--- Ye array React ko batata hai ki sirf tab run karo jab 'search' change ho
 
     const handleSelectCollege = async (collegeName) => {
-        if (!user) return;
+        if (!user) return; // Agar user logged in nahi hai, to aage mat badho
         
-        // Save the chosen college into the PostgreSQL Database (Prisma) using our custom Express route
+        // ...
+        // Step 3: Jab user kisi college par click kare, to usko database mein save karo
+        // ...
         await fetch("http://localhost:5000/api/save-college", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                clerkId: user.id,
-                collegeName: collegeName 
+                clerkId: user.id, // User ki unique ID bhej rahe hain
+                collegeName: collegeName, // Selected college ka naam bhej rahe hain
+                collegeId: allColleges.find(c => c.name === collegeName)?.id // collegeId bhi bhej rahe hain! this is very imp
+                
             })
         });
 
-        // Redirect the user to the Campus Feed after successfully onboarding
+        // ...
+        // Step 4: Jab college save ho jaye, to user ko Campus Feed wale page par bhej do!
+        // ...
         navigate("/campus-feed");
     };
 
     return(
         <div className="p-8 max-w-lg mx-auto mt-20">
-            <h1 className="text-2xl font-bold mb-4">Welcome! Which college do you attend?</h1>
+            <h1 className="text-2xl font-bold mb-4">Which college do you attend?</h1>
             
-            {isLoading ? (
-                <div className="text-gray-500 my-4">Loading 39,000+ colleges...</div>
-            ) : (
-                <input 
-                    type="text" 
-                    placeholder="Search College..." 
-                    value={search} 
-                    onChange={(e) => setSearch(e.target.value)} 
-                    className="w-full p-2 border rounded mb-4 text-black"
-                />
-            )}
+            <input 
+                type="text" 
+                placeholder="Search College..." 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                className="w-full p-2 border rounded mb-4 text-black"
+            />
+
+            {isLoading && <p className="text-gray-500 mb-2">Searching database...</p>}
 
             <ul className="bg-white shadow rounded overflow-hidden max-h-80 overflow-y-auto text-black">
-                {filteredColleges.map((college, index) => (
+                {allColleges.map((college) => (
                     <li 
-                        key={index} 
-                        onClick={() => handleSelectCollege(college)}
-                        className="p-3 border-b hover:bg-gray-100 cursor-pointer"
+                        key={college.id} 
+                        onClick={() => handleSelectCollege(college.name)}
+                        className="p-3 border-b hover:bg-gray-100 cursor-pointer flex items-center justify-between"
                     >
-                        {college}
+                        <span>{college.name}</span>
+                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">Code: {college.id}</span>
                     </li>
                 ))}
+                
+                {allColleges.length === 0 && !isLoading && (
+                    <li className="p-3 text-gray-500">No colleges found.</li>
+                )}
             </ul>
         </div>
     )

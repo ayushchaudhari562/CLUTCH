@@ -26,7 +26,8 @@ model User {
   email         String   @unique
   passwordHash  String
   fullName      String?
-  collegeName   String?            
+  collegeName   String? 
+  collegeId     Int?      
   bio           String?
   profileImage  String?
   createdAt     DateTime @default(now())

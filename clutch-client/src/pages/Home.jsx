@@ -1,11 +1,32 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import bgImg from "../image/background-wall-concept-with-copy-space.jpg";
 
 const Home = ({ swaps = [] }) => {
+  const { user } = useUser();
   const [session, setSession] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [userCollege, setUserCollege] = useState("Loading...");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:5000/api/user/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.collegeName) {
+            setUserCollege(data.collegeName);
+          } else {
+            setUserCollege("No college selected");
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching user data:", err);
+          setUserCollege("Error loading college");
+        });
+    }
+  }, [user]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -59,7 +80,7 @@ const Home = ({ swaps = [] }) => {
             Day Streak: {session}
           </div>
           <div className="bg-white shadow rounded-md p-3">
-            College Rank: {session}
+            College: <span className="font-semibold text-blue-600">{userCollege}</span>
           </div>
           <button className="cursor-pointer  bg-blue-300 text-red-600 text-xs px-6 py-3 rounded-full font-semibold shadow-sm">
             SOS

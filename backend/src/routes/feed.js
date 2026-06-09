@@ -1,7 +1,7 @@
 // backend/src/routes/feed.js
 const express = require('express');
 const router = express.Router();
-const { createPost,getAllPosts } = require('../controllers/multercon');
+const { createPost, getAllPosts } = require('../controllers/postController');
 const upload = require('../services/multer');
 
 // Use upload.single('image') where 'image' is 
