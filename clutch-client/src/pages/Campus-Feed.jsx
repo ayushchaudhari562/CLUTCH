@@ -11,19 +11,32 @@ const CampusFeed = () => {
   const [posts,setPosts] = useState([]);
   ////..fetching post form db
   //..
+  //..to update the college like
+  //  the which has most post it will so on top 
+  const [sidebarColleges,setSidebarColleges] = useState([]);
+  //..
+  //..
+   const [selectedCollegeId, setSelectedCollegeId] = useState(null);//demo ke liye but i guess i would remove it jb optimazation krunga tb remove krunga
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/feed/all");
-        const data = await response.json();
-        setPosts(data);
+const url = selectedCollegeId 
+            ? `http://localhost:5000/api/feed/all?collegeId=${selectedCollegeId}` 
+            : `http://localhost:5000/api/feed/all`;
+                    
+            fetch(url).then(res => res.json()).then(data =>{
+              setPosts(data.post); //foe now saving this post here also i can optimzation;
+              setSidebarColleges(data.topColleges); //sidebar save krne ke liye
+
+            })
       } catch (error) {
         console.error("Failed to fetch posts:", error);
       }
     };
     
     fetchPosts();
-  }, []);
+  }, [selectedCollegeId]);
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans">
