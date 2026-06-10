@@ -18,6 +18,38 @@ const CampusFeed = () => {
   //..
    const [selectedCollegeId, setSelectedCollegeId] = useState(null);//demo ke liye but i guess i would remove it jb optimazation krunga tb remove krunga
 
+  // Recently viewed posts state
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+
+  // Load from local storage on mount
+  //...
+  //...
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('recentlyViewedPosts');
+    if (savedHistory) {
+      try {
+        setRecentlyViewed(JSON.parse(savedHistory));
+      } catch(e) {
+        console.error("Failed to parse history", e);
+      }
+    }
+  }, []);
+
+  // Handle post click
+  const handlePostClick = (post) => {
+    const viewedPost = {
+      id: post.id,
+      title: post.title,
+      viewedAt: Date.now()
+    };
+
+    setRecentlyViewed((prevHistory) => {
+      const filteredHistory = prevHistory.filter(p => p.id !== post.id);
+      const updatedHistory = [viewedPost, ...filteredHistory].slice(0, 5);
+      localStorage.setItem('recentlyViewedPosts', JSON.stringify(updatedHistory));
+      return updatedHistory;
+    });
+  };
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -131,7 +163,7 @@ const CampusFeed = () => {
                     {/* Dynamically Rendered Posts */}
           <div className="space-y-6">
             {posts.map((post) => (
-              <div key={post.id} className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
+              <div key={post.id} onClick={() => handlePostClick(post)} className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d] cursor-pointer hover:border-gray-600 transition-colors">
                 <div className="flex gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
                     U1
@@ -181,36 +213,21 @@ const CampusFeed = () => {
         <div className="md:col-span-3 space-y-6">
           
           <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
-            <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">RECENT</h2>
+            <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">RECENTLY VIEWED</h2>
             <ul className="space-y-4">
-              <li className="flex gap-3">
-                <span className="text-gray-500 font-medium">1</span>
-                <div>
-                  <h4 className="font-semibold text-gray-200 text-sm">DBMS viva prep</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">24 posts</p>
-                </div>
-              </li>
-              <li className="flex gap-3 pt-4 border-t border-[#2d2d2d]">
-                <span className="text-gray-500 font-medium">2</span>
-                <div>
-                  <h4 className="font-semibold text-gray-200 text-sm">Amazon internship</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">18 posts</p>
-                </div>
-              </li>
-              <li className="flex gap-3 pt-4 border-t border-[#2d2d2d]">
-                <span className="text-gray-500 font-medium">3</span>
-                <div>
-                  <h4 className="font-semibold text-gray-200 text-sm">Attendance policy</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">15 posts</p>
-                </div>
-              </li>
-              <li className="flex gap-3 pt-4 border-t border-[#2d2d2d]">
-                <span className="text-gray-500 font-medium">4</span>
-                <div>
-                  <h4 className="font-semibold text-gray-200 text-sm">CN PYQs dropped</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">11 posts</p>
-                </div>
-              </li>
+              {recentlyViewed.map((item, index) => (
+                <li key={item.id} className={`flex gap-3 ${index !== 0 ? 'pt-4 border-t border-[#2d2d2d]' : ''}`}>
+                  <span className="text-gray-500 font-medium">{index + 1}</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-200 text-sm line-clamp-1">{item.title}</h4>
+                    <p className="text-gray-500 text-xs mt-0.5">Clicked recently</p>
+                  </div>
+                </li>
+              ))}
+              
+              {recentlyViewed.length === 0 && (
+                <p className="text-gray-500 text-sm">No recent clicks</p>
+              )}
             </ul>
           </div>
 
