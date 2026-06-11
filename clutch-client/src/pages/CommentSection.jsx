@@ -14,7 +14,7 @@ const CommentSection = ({comment}) => {
                 <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 shrink-0">
                     U
                 </div>
-                <div className="flex 1">
+                <div className="flex-1 flex flex-col">
                     <div className="bg-[#1c1c1c] p-4 rounded-xl border border-[#2d2d2d]">
                         <h5 className="font-semibold text-gray-200 text-sm mb-1">
                             {comment.author}
@@ -41,7 +41,7 @@ const CommentSection = ({comment}) => {
                     {showReplies && comment.replies && (
                         <div className="border-l-2 border-[#2d2d2d] pl-6 mt-4 space-y-4">
                             {comment.replies.map(reply =>(
-                                <CommentsSection key={reply.id} comment={reply}/>
+                                <CommentSection key={reply.id} comment={reply}/>
                             ))}
                         </div>
                     )}

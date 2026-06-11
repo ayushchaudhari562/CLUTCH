@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from "react";
 import { useParams,useNavigate } from "react-router-dom";
+import CommentSection from "../pages/CommentSection";
 
 const CommentMain = ()=>{
 
@@ -72,7 +73,7 @@ const CommentMain = ()=>{
           </div>
           <div>
             {comments.map(comment =>(
-                <CommentMain key={comment.id} comment={comment}/>
+                <CommentSection key={comment.id} comment={comment}/>
             ))}
           </div>
         </div>

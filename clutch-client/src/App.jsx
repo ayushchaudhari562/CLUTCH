@@ -16,7 +16,7 @@ import Campusd from './pages/Campus-Feed';
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import CollegeSelector from './api/College';
-import CommentSection from './pages/CommentSection';
+import CommentMain from './api/CommentsMain';
 
 const App = () => {
   const [swaps, setSwaps] = useState(() => {
@@ -47,7 +47,7 @@ const App = () => {
           <Route path='/study-room' element={<StudyRoom />} />
           <Route path='/campus-feed' element={<Campusd/>}/>
           <Route path='/profile' element ={<Profile/>}/>
-          <Route path='/post/:postId' element={<CommentSection/>}/>
+          <Route path='/post/:postId' element={<CommentMain/>}/>
         </Routes>
       </BrowserRouter>
     </>
