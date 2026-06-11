@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from "react";
 import { useParams,useNavigate } from "react-router-dom";
 import CommentSection from "../pages/CommentSection";
+import dummyComments from "../data/comments.json";
 
 const CommentMain = ()=>{
 
@@ -12,8 +13,10 @@ const CommentMain = ()=>{
     const [post, setPost] = useState(null);
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
-     useEffect(() => {
-    // YAHAN BACKEND CALL AAYEGI! Abhi ke liye maine Dummy Data dal diya hai UI check karne ke liye:
+    const [newCommentText, setNewCommentText] = useState("");
+
+    useEffect(() => {
+    // Dummy post metadata for now, but fetching real comments from backend
     setTimeout(() => {
       setPost({
         id: postId,
@@ -22,26 +25,43 @@ const CommentMain = ()=>{
         author: "Ayush",
         createdAt: new Date().toISOString()
       });
-      setComments([
-        {
-          id: 1, author: 'User A', text: '3NF mein transitive dependency nahi hoti, BCNF thoda aur strict hai...',
-          replies: [
-            { 
-              id: 2, author: 'User B', text: 'Sahi baat hai, har BCNF 3NF hota hai par har 3NF BCNF nahi hota.', 
-              replies: [
-                 { id: 3, author: 'User A', text: 'Exactly bhai!' } // Nested ke andar nested!
-              ] 
-            }
-          ]
-        },
-        {
-           id: 4, author: 'User C', text: 'YouTube pe Gate Smashers ki video dekh le bhai',
-           replies: []
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
+      
+      
+      fetch(`http://localhost:5000/api/comments/${postId}`)
+        .then(res => res.json())
+        .then(data => {
+            setComments(data);
+            setLoading(false);
+        })
+        .catch(err => {
+            console.error("Error fetching comments:", err);
+            setLoading(false);
+        });
+    }, 500); 
   }, [postId])
+
+  const handlePostComment = () => {
+      if(!newCommentText.trim()) return;
+      
+      fetch(`http://localhost:5000/api/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              postId,
+              userId: 1, // Abhi ke liye 1 de rahe hain, auth aane pe change hoga
+              content: newCommentText,
+              parentId: null
+          })
+      })
+      .then(res => res.json())
+      .then(newComment => {
+          setNewCommentText("");
+          // UI update karne ke liye wapas fetch kar lo
+          fetch(`http://localhost:5000/api/comments/${postId}`)
+            .then(res => res.json())
+            .then(data => setComments(data));
+      });
+  };
 
   if(loading) return(<>
     <div className="text-white text-center mt-20 text-xl font-semibold animate-pulse">Loading Post...</div>;
@@ -64,10 +84,12 @@ const CommentMain = ()=>{
            <div className="flex gap-3 mb-8">
             <input 
               type="text" 
+              value={newCommentText}
+              onChange={(e) => setNewCommentText(e.target.value)}
               placeholder="Add a comment..." 
               className="flex-1 bg-[#1c1c1c] text-white px-4 py-3 rounded-lg border border-[#2d2d2d] focus:outline-none focus:border-indigo-500"
             />
-            <button className="bg-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+            <button onClick={handlePostComment} className="bg-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
               Post
             </button>
           </div>

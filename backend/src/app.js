@@ -9,9 +9,11 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
 const collegeRoutes = require('./routes/college');
+const commentRoutes = require('./routes/comments');
 
 app.use('/api/feed', feedRoutes);
 app.use('/api', authRoutes);
 app.use('/api/colleges', collegeRoutes);
+app.use('/api/comments', commentRoutes);
 
 module.exports = app;

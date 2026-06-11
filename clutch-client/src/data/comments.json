@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "author": "Ayush",
+    "text": "3NF mein transitive dependency nahi hoti, BCNF thoda aur strict hai bhai.",
+    "replies": [
+      {
+        "id": 2,
+        "author": "Rahul",
+        "text": "Sahi baat hai, har BCNF 3NF hota hai par har 3NF BCNF nahi hota.",
+        "replies": [
+          {
+            "id": 3,
+            "author": "Ayush",
+            "text": "Exactly! Viva ke liye bas itna yaad rakh le bohot hai.",
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "author": "Priya",
+        "text": "Any real life example for this?",
+        "replies": [
+          {
+            "id": 5,
+            "author": "Rahul",
+            "text": "Student -> Course -> Professor wala example best hai.",
+            "replies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "author": "Karan",
+    "text": "YouTube pe Gate Smashers ki DBMS playlist dekh le, mast samjhaya hai.",
+    "replies": []
+  },
+  {
+    "id": 7,
+    "author": "Sneha",
+    "text": "Mera toh padh ke hi dimaag kharab ho gaya hai 😭",
+    "replies": [
+      {
+        "id": 8,
+        "author": "Ayush",
+        "text": "Tension na le, pass toh ho hi jayenge sab.",
+        "replies": []
+      }
+    ]
+  }
+]
