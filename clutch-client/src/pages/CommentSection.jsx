@@ -8,6 +8,9 @@ import React, { useState, useEffect } from "react";
 //..
 const CommentSection = ({comment}) => {
     const [showReplies, setShowReplies] = useState(false);
+     const [isReplying, setIsReplying] = useState(false); 
+    const [isEditing, setIsEditing] = useState(false);   
+    const [editValue, setEditValue] = useState(comment.text);
     return (
         <>
             <div className="flex gap-4">
@@ -19,7 +22,27 @@ const CommentSection = ({comment}) => {
                         <h5 className="font-semibold text-gray-200 text-sm mb-1">
                             {comment.author}
                         </h5>
-                        <p className="text-gray-300 text-[15px]">{comment.text}</p>
+                        {isEditing ? (
+    <div className="mt-2">
+        <input 
+            type="text" 
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            className="w-full bg-[#141414] text-white px-3 py-2 rounded border border-[#2d2d2d] focus:border-indigo-500 outline-none"
+        />
+        <div className="flex gap-2 mt-2">
+            <button onClick={() => {
+                // Yahan Backend pe UPDATE call jayegi
+                console.log("Updated to:", editValue); 
+                setIsEditing(false);
+            }} className="text-xs bg-indigo-600 px-3 py-1 rounded text-white">Save</button>
+            <button onClick={() => setIsEditing(false)} className="text-xs text-gray-400">Cancel</button>
+        </div>
+    </div>
+) : (
+    <p className="text-gray-300 text-[15px]">{comment.text}</p>
+)}
+
 
                     </div>
                     <div className="flex gap-4 mt-2 ml-2">
