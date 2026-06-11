@@ -7,7 +7,7 @@ import {useParams,useNavigate} from 'react-router-dom';
 //..
 //..
 const CommentSection = ()=>{
-    const [show]
+    const [showReplies]
     return(
         <>
             hello
