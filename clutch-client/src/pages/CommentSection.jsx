@@ -14,8 +14,8 @@ const CommentSection = () => {
                 <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 shrink-0">
                     U
                 </div>
-                <div>
-                    
+                <div className="flex 1">
+
                 </div>
 
             </div>
