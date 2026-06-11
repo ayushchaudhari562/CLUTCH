@@ -1,4 +1,4 @@
-impoet
+import
 
 
 const CommentSection = ()=>{
