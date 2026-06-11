@@ -16,7 +16,7 @@ const CommentSection = () => {
                 </div>
                 <div className="flex 1">
                     <div className="bg-[#1c1c1c] p-4 rounded-xl border border-[#2d2d2d]">
-                        <h5 className=""></h5>
+                        <h5 className="font-semibold text-gray-200 text-sm mb-1"></h5>
                     </div>
 
                 </div>
