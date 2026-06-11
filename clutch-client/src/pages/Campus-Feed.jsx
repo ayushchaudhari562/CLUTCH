@@ -1,5 +1,6 @@
 import React, { useState ,useEffect} from "react";
 import FeedPost from '../components/campus-feed/Feed-post';
+import CommentSection from "./CommentSection";
 
 const CampusFeed = () => {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -163,7 +164,7 @@ const CampusFeed = () => {
                     {/* Dynamically Rendered Posts */}
           <div className="space-y-6">
             {posts.map((post) => (
-              <div key={post.id} onClick={() => handlePostClick(post)} className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d] cursor-pointer hover:border-gray-600 transition-colors">
+              <div key={post.id}  onClick={()=> navigate(`/posts/${post.id}`);handlePostClick(post);} className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d] cursor-pointer hover:border-gray-600 transition-colors">
                 <div className="flex gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-300 font-medium shrink-0">
                     U1
