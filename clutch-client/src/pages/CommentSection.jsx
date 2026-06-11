@@ -10,8 +10,8 @@ const CommentSection = ()=>{
     const [showReplies,setShowReplies] = useState(false);
     return(
         <>
-            <div>
-                
+            <div className="flex gap-4">
+
             </div>
         </>
     )
