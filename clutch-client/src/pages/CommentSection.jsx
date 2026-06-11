@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 //..The main concept of the nested recursion;
 //..
 //..
-const CommentSection = () => {
+const CommentSection = ({comment}) => {
     const [showReplies, setShowReplies] = useState(false);
     return (
         <>
@@ -16,7 +16,16 @@ const CommentSection = () => {
                 </div>
                 <div className="flex 1">
                     <div className="bg-[#1c1c1c] p-4 rounded-xl border border-[#2d2d2d]">
-                        <h5 className="font-semibold text-gray-200 text-sm mb-1"></h5>
+                        <h5 className="font-semibold text-gray-200 text-sm mb-1">
+                            {comment.author}
+                        </h5>
+                        <p className="text-gray-300 text-[15px]">{comment.text}</p>
+
+                    </div>
+                    <div className="flex gap-4 mt-2 ml-2">
+                        <button className="text-ts text-gray-400 havor:text-white font-medium">
+                            Reply
+                        </button>
                     </div>
 
                 </div>
