@@ -1,4 +1,4 @@
-import React,{useState,use};
+import React,{useState,useEffect};
 
 
 const CommentSection = ()=>{
