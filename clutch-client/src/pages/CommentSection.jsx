@@ -7,7 +7,7 @@ import {useParams,useNavigate} from 'react-router-dom';
 //..
 //..
 const CommentSection = ()=>{
-    const [showReplies]
+    const [showReplies,setShowReplies] = useState(null);
     return(
         <>
             hello
