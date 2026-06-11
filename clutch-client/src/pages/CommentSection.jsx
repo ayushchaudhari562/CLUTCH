@@ -15,7 +15,7 @@ const CommentSection = () => {
                     U
                 </div>
                 <div className="flex 1">
-                    <div className="bg">
+                    <div className="">
 
                     </div>
 
