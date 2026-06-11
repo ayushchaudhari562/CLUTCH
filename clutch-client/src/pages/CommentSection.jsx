@@ -3,7 +3,7 @@ import {useParams,useNavigate} from 'react-router-dom';
 
 //..
 //..
-//..
+//..The main con
 const CommentSection = ()=>{
     return(
         <>
