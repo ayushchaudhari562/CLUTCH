@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from "react";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams,useNavigate, useLocation } from "react-router-dom";
 import CommentSection from "../pages/CommentSection";
 import dummyComments from "../data/comments.json";
 
@@ -9,24 +9,22 @@ const CommentMain = ()=>{
     const navigate = useNavigate();
 
     //for data part these three hooks for data part only;
-    //..
-    const [post, setPost] = useState(null);
+    const location = useLocation();
+    
+    // Get the post passed from Campus-Feed or fallback to empty object if refreshed
+    const [post, setPost] = useState(location.state?.post || {
+        id: postId,
+        title: "Loading...",
+        content: "",
+        author: "Unknown"
+    });
+    
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newCommentText, setNewCommentText] = useState("");
 
     useEffect(() => {
-    // Dummy post metadata for now, but fetching real comments from backend
-    setTimeout(() => {
-      setPost({
-        id: postId,
-        title: "Doubt in DBMS Normalization",
-        content: "Bhai koi BCNF aur 3NF ke beech ka difference simple bhasha mein samjha do, kal viva hai!",
-        author: "Ayush",
-        createdAt: new Date().toISOString()
-      });
-      
-      
+      // REAL BACKEND CALL to get comments for this real post
       fetch(`http://localhost:5000/api/comments/${postId}`)
         .then(res => res.json())
         .then(data => {
@@ -37,7 +35,6 @@ const CommentMain = ()=>{
             console.error("Error fetching comments:", err);
             setLoading(false);
         });
-    }, 500); 
   }, [postId])
 
   const handlePostComment = () => {

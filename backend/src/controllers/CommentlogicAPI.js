@@ -1,9 +1,15 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
 
 const addComment = async (req,res)=>{
     try{
-        const {postId,userId,content,parentId} = req.body;
+        let {postId,userId,content,parentId} = req.body;
+        
+        // FAKE AUTH FIX: Database se jo bhi pehla user mile, uski ID use kar lo taaki foreign key error na aaye.
+        // Jab asli Auth lagaoge tab isko hata dena!
+        const existingUser = await prisma.user.findFirst();
+        if(existingUser) {
+            userId = existingUser.id;
+        }
 
         const newComment = await prisma.comment.create({
             data:{
@@ -41,7 +47,7 @@ const getPostComments = async (req, res) => {
     allComments.forEach(comment => {
       commentMap[comment.id] = { 
         id: comment.id,
-        author: comment.user.username,
+        author: comment.user?.username || "Unknown",
         text: comment.content,
         parentId: comment.parentId,
         replies: [] 
