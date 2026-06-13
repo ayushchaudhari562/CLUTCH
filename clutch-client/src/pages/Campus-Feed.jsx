@@ -1,10 +1,11 @@
 import React, { useState ,useEffect} from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import FeedPost from '../components/campus-feed/Feed-post';
 import CommentSection from "./CommentSection";
 
 const CampusFeed = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   //..
@@ -19,7 +20,7 @@ const CampusFeed = () => {
   const [sidebarColleges,setSidebarColleges] = useState([]);
   //..
   //..
-   const [selectedCollegeId, setSelectedCollegeId] = useState(null);//demo ke liye but i guess i would remove it jb optimazation krunga tb remove krunga
+   const [selectedCollegeId, setSelectedCollegeId] = useState(location.state?.selectedCollegeId || null);//demo ke liye but i guess i would remove it jb optimazation krunga tb remove krunga
 
   // Recently viewed posts state
   const [recentlyViewed, setRecentlyViewed] = useState([]);
