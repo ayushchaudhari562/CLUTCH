@@ -25,11 +25,8 @@ model User {
   username      String   @unique
   email         String   @unique
   passwordHash  String
-  fullName      String?
   collegeName   String? 
   collegeId     Int?      
-  bio           String?
-  profileImage  String?
   createdAt     DateTime @default(now())
   posts         Post[]
   likes         Like[]
