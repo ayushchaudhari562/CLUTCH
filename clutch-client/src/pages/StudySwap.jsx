@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import studyRoom from "./StudyRoom";
+import { useNavigate } from "react-router-dom";
 import socket from "../socket/socket";
 
 const StudySwap = ({ swaps = [], addSwap }) => {

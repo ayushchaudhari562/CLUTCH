@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import bgImg from "../image/background-wall-concept-with-copy-space.jpg";
 
 const Home = ({ swaps = [] }) => {
   const { user } = useUser();
-  const [session, setSession] = useState(0);
+  const [session] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userCollege, setUserCollege] = useState("Loading...");
   const navigate = useNavigate();

@@ -1,8 +1,7 @@
-import React,{useState,useEffect} from "react";
+import {useState,useEffect} from "react";
 import { useParams,useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import CommentSection from "../pages/CommentSection";
-import dummyComments from "../data/comments.json";
 
 const CommentMain = ()=>{
 
@@ -13,8 +12,7 @@ const CommentMain = ()=>{
     //for data part these three hooks for data part only;
     const location = useLocation();
     
-    // Get the post passed from Campus-Feed or fallback to empty object if refreshed
-    const [post, setPost] = useState(location.state?.post || {
+    const [post] = useState(location.state?.post || {
         id: postId,
         title: "Loading...",
         content: "",
@@ -27,7 +25,6 @@ const CommentMain = ()=>{
     
     // Sidebar colleges state
     const [sidebarColleges, setSidebarColleges] = useState([]);
-    const [selectedCollegeId, setSelectedCollegeId] = useState(null);
 
     useEffect(() => {
       // REAL BACKEND CALL to get comments for this real post

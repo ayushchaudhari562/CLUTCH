@@ -1,7 +1,6 @@
-import React, { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import FeedPost from '../components/campus-feed/Feed-post';
-import CommentSection from "./CommentSection";
 
 const CampusFeed = () => {
   const navigate = useNavigate();
@@ -23,21 +22,17 @@ const CampusFeed = () => {
    const [selectedCollegeId, setSelectedCollegeId] = useState(location.state?.selectedCollegeId || null);//demo ke liye but i guess i would remove it jb optimazation krunga tb remove krunga
 
   // Recently viewed posts state
-  const [recentlyViewed, setRecentlyViewed] = useState([]);
-
-  // Load from local storage on mount
-  //...
-  //...
-  useEffect(() => {
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
     const savedHistory = localStorage.getItem('recentlyViewedPosts');
     if (savedHistory) {
       try {
-        setRecentlyViewed(JSON.parse(savedHistory));
+        return JSON.parse(savedHistory);
       } catch(e) {
         console.error("Failed to parse history", e);
       }
     }
-  }, []);
+    return [];
+  });
 
   // Handle post click
   const handlePostClick = (post) => {
