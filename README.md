@@ -6,12 +6,12 @@ CLUTCH is a decentralized, peer-to-peer campus learning network and community ap
 
 ---
 
-## 1. System Architecture
+## 1. System Topology
 
 The software architecture consists of a client-server paradigm with real-time bidirectional messaging and third-party authentication integration.
 
 ```mermaid
-graph TD
+flowchart TD
     User([Client Application]) -->|Session & Token Exchange| Clerk[Clerk Authentication Service]
     User -->|RESTful Operations| Express[Express.js Application Server]
     User -->|Bidirectional Event Sync| SocketIO[Socket.io Server]
@@ -75,39 +75,90 @@ graph TD
 
 ---
 
-## 4. Directory Layout
+## 4. Detailed Repository and Directory Architecture
 
-```
-CLUTCH/
-├── backend/                  # Application server and socket handlers
-│   ├── college_name/         # Contains raw institutional registry (Excel sheets)
-│   ├── prisma/               # Database migration files and client schema specifications
-│   ├── src/
-│   │   ├── controllers/      # Route logic for relational models (Posts, nested comments)
-│   │   ├── middleware/       # Middleware functions (Binary file parsing, auth helpers)
-│   │   ├── routes/           # REST endpoints mapping client actions
-│   │   ├── services/         # Auxiliary helpers and algorithms
-│   │   ├── sockets/          # Socket.io connection and message namespaces
-│   │   ├── app.js            # Express application instance declaration
-│   │   └── server.js         # Entrypoint binding Express app and socket server to TCP ports
-│   ├── seed.js               # Database seeding script mapping Excel rows to PostgreSQL
-│   └── package.json
-│
-├── clutch-client/            # Client interface application code
-│   ├── public/
-│   ├── src/
-│   │   ├── api/              # API interface abstractions and onboarding views
-│   │   ├── components/       # Core UI component classes (Navigation, study room layout)
-│   │   ├── hooks/            # Custom hooks (WebRTC peer creation, state listeners)
-│   │   ├── pages/            # View managers (Social feed, matchmaking, virtual room)
-│   │   ├── socket/           # WebSocket socket.io client initialization
-│   │   ├── App.jsx           # Client component tree and route configuration
-│   │   └── main.jsx          # React entrypoint mounting DOM node
-│   └── package.json
-│
-├── package.json              # Monorepo task configurations
-└── README.md
-```
+The system is configured as a client-server project containing isolated backend and frontend workspaces. Below is the itemized breakdown of structural files and directories, clarifying files, logic layers, and internal components.
+
+### 4.1 Backend Project Directory (`/backend`)
+
+The backend codebase manages HTTP routing, WebSocket event handlers, relational database connectivity, and administrative setup scripts.
+
+*   **`college_name/`**
+    *   `college_codes.xlsx`: Binary Excel worksheet holding the master list of academic institutions with unique numerical identifiers (`Code`) and textual labels (`College Name`).
+*   **`prisma/`**
+    *   `schema.prisma`: The primary configuration of the database layout, mapping target entities, relations, cascades, indices, and generation adapters.
+*   **`src/`**
+    *   **`controllers/`**
+        *   `CommentlogicAPI.js`: Manages relational comments. Features:
+            *   `addComment`: Inserts comments. If the calling user entity doesn't exist locally, it executes an automated schema creation utilizing Clerk parameters.
+            *   `getPostComments`: Resolves comments associated with a `postId`. Translates the database's flat array schema into a recursive hierarchical tree structure, calculating pseudonym indexes via user key mod limits.
+            *   `editComment`: Handles comment update requests, mutating stored text fields.
+        *   `postController.js`: Controls post creation and retrieval. Features:
+            *   `createPost`: Processes text contents and local file targets, executing image URL assignments.
+            *   `getAllPosts`: Resolves post objects dynamically using client-driven filtering criteria (limiting content to corresponding `collegeId` keys) and resolves top active institutions using aggregate RAW queries.
+    *   **`middleware/`**
+        *   `authMiddleware.js`: Houses middleware hook slots for intercepting request streams, analyzing headers, and validating identity tokens.
+    *   **`routes/`**
+        *   `auth.js`: Declares paths to save user profile changes (upserting user instances on selected college fields) and retrieve user attributes using Clerk IDs.
+        *   `college.js`: Maps institutional searches, routing input keywords to query PostgreSQL tables with case-insensitive contains-operators.
+        *   `comments.js`: Standardizes routes (`POST /`, `GET /:postId`, `PUT /:id`) mapping comments to controller methods.
+        *   `feed.js`: Endpoints (`POST /create`, `GET /all`) controlling post workflows and binding multer file interceptors.
+    *   **`services/`**
+        *   `multer.js`: Service configured to map multipart form submissions. Creates directory `/uploads/` on bootstrap, generates safe randomized file outputs via filesystem utilities, and implements strict size filters.
+    *   **`sockets/`**
+        *   `chatHandler.js`: Socket callback mapper. Coordinates workspace connections, parses instant message buffers, registers signaling handlers (`webrtc-offer`, `webrtc-answer`, `webrtc-ice-candidate`), and handles call rejection states.
+        *   `whiteboardHandler.js`: Intercepts Excalidraw updates, broadcasting serial coordinates directly to client sets bound to the active roomId.
+    *   **`app.js`**: Initializes the Express application, configures CORS policies, establishes JSON parsers, registers static file exposure on `/uploads`, and mounts core routing paths under `/api`.
+    *   **`server.js`**: App entrypoint. Creates the base HTTP server, instantiates Socket.io with origin policies, links socket handlers, and binds the stack to the configured TCP socket.
+*   **`seed.js`**: Read-and-load utility using `xlsx` to parse `college_codes.xlsx` and insert the institutional elements into the PostgreSQL `Colleges` table while skipping duplicates.
+
+---
+
+### 4.2 Frontend Client Directory (`/clutch-client`)
+
+The frontend application code builds pages and components inside a single-page app framework.
+
+*   **`public/`**
+    *   Contains static resources, images, and localized browser manifest assets.
+*   **`src/`**
+    *   **`api/`**
+        *   `College.jsx`: Renders the onboarding college selection view. Conducts continuous database searches as users enter terms and dispatches POST updates to link accounts to institutions.
+        *   `CommentsMain.jsx`: Renders comments under individual posts, orchestrating tree nodes, replies, comment creation inputs, and edits.
+        *   `dsa.js` / `swap.js`: Utility files handling structural constants and formatting styles.
+    *   **`components/`**
+        *   `AIGapQuiz.jsx`: Embeds generative review elements and question forms.
+        *   `ChatBox.jsx`: Reusable sidebar container for standard text messaging.
+        *   `Navbar.jsx`: Application header providing links to pages (Home, Study Swap, Study Room, Feed, Profile) and mounting Clerk sign-in controls.
+        *   `SwapCard.jsx`: Abstract UI block formatting learning assets, seeking competencies, and urgency tags.
+        *   `Whiteboard.jsx`: Layout block hosting the cooperative workspace.
+        *   **`campus-feed/`**
+            *   `Feed-post.jsx`: Pop-up window for post creation. Prepares multiline text areas, local file input bindings, and uploads posts using `FormData` envelopes to POST endpoints.
+            *   `Filter.jsx` / `Recent.jsx`: Filters feed streams by time or category flags.
+        *   **`studyroom/`**
+            *   `ChatPanel.jsx`: Highly optimized chat container. Highlights:
+                *   *Reconciliation Optimization:* Employs a specialized `MessageBubble` sub-component wrapped inside `React.memo` to skip bubble re-rendering when new items are appended.
+                *   *Reliable Identification:* Resolves socket ID variables using reference listeners (`socketIdRef`) to prevent initialization race-conditions.
+                *   *Disk I/O Throttling:* Debounces local storage persistence writes by 500ms using side-effect cleanup routines.
+                *   *Memory Bounds:* Enforces a strict limit of 100 entries on the messages list using slicing operations to optimize browser DOM size.
+            *   `IncomingCallModal.jsx`: Pop-up overlay warning users of incoming RTC connection offers, mapping accepts and declines.
+            *   `VideoPanel.jsx`: Layout block showing local and remote video objects side-by-side using references to bind active media stream tracks.
+            *   `Whiteboard.jsx`: Mounts the `@excalidraw/excalidraw` editor. Listens to update events, intercepts modifications, breaks update loop cycles via internal flag variables, and uses debounced socket emissions (30ms) to throttle updates.
+    *   **`hooks/`**
+        *   `useWebRTC.js`: Custom signaling hook managing RTC states. Negotiates call requests, binds local hardware inputs to RTCPeerConnection, processes ICE candidates, and manages SDP offer/answer states.
+    *   **`pages/`**
+        *   `Campus-Feed.jsx`: Renders the institutional feed page. Displays community posts, and features post creation tools and engagement analytics boards.
+        *   `CommentSection.jsx`: Page view managing comments, resolving individual posts and handling structured nested threads.
+        *   `Home.jsx`: The application dashboard showing user profiles, active study pairings, and core feature entries.
+        *   `Leaderboard.jsx`: Displays top institutional rankings based on community engagement counts.
+        *   `Profile.jsx`: Allows users to view identity records, registered college affiliations, and active post histories.
+        *   `SignIn.jsx` / `SignUp.jsx`: Pages wraps rendering Clerk auth flow components.
+        *   `StudyRoom.jsx`: The layout manager for collaborative sessions. Features a draggable separator handle implementing mouse-tracking width calculation formulas to dynamically resize panels.
+        *   `StudySwap.jsx`: Renders active skill lists and DSA queries. Integrates forms to submit swap posts and manages incoming matchmaking invitation modals.
+    *   **`socket/`**
+        *   `socket.js`: Exports a singleton instance of the Socket.io client connection pointed to the backend, enabling shared socket links across independent components.
+    *   **`App.jsx`**: Main route manager. Maps paths using React Router and coordinates application state.
+    *   **`index.css`**: Global stylesheet initializing custom CSS rules and mounting Tailwind utilities.
+    *   **`main.jsx`**: Application entrypoint configuring Clerk wraps and mounting the DOM root node.
 
 ---
 
@@ -140,6 +191,17 @@ model Post {
   author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   likes      Like[]
   comments   Comment[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
 }
 
 model Comment {
@@ -220,7 +282,7 @@ Communication over the WebSocket interface executes under the following specific
    ```bash
    npm install
    ```
-3. Initialize the client environment configuration file `.env` inside `clutch-client/`:
+3. Configure the local environment file `.env` inside `clutch-client/`:
    ```env
    VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
    ```
