@@ -130,7 +130,7 @@ const CampusFeed = () => {
           <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
             <div className="flex gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-purple-900/50 flex items-center justify-center text-purple-300 font-medium shrink-0">
-                AK
+                €
               </div>
               <div className="flex-1">
                 <div  onClick={() => setIsPostModalOpen(true)}
