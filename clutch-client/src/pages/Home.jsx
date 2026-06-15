@@ -51,7 +51,7 @@ const Home = ({ swaps = [] }) => {
 
   return (
     <>
-      <div className="m-5 space-y-6 bg-[url('bgImg')] h-screen w-full">
+      <div className="m-5 space-y-6 bg-[url('bgImg')] h-screen ">
         <div className="flex items-center border-b border-amber-200 pb-2">
           <section className="text-lg font-semibold text-gray-700">
             <h1>{getGreeting()}</h1>
