@@ -1,105 +1,119 @@
-# CLUTCH ⚡
+# CLUTCH
 
-> **A Peer-to-Peer Campus Learning & Interactive Community Hub**
+## Platform Architecture and Technical Specification
 
-CLUTCH is a modern, full-stack real-time collaboration and community platform designed specifically for college students. It enables peers to connect, trade skills or DSA expertise, interact in fully collaborative study rooms with real-time video/audio and shared whiteboards, and engage in anonymous college-specific feeds.
+CLUTCH is a decentralized, peer-to-peer campus learning network and community application built for students. It facilitates academic exchange, peer matchmaking, real-time audio/visual communication, collaborative vector whiteboards, and localized discussions restricted by college affiliation.
 
 ---
 
-## 📌 Project Overview
+## 1. System Architecture
 
-Clutch bridges the gap between students seeking help and those willing to teach. It features a unique **Study Swap** matchmaking engine, a virtual **Study Room** equipped with WebRTC video calling and a synchronized Excalidraw whiteboard, and a **Campus Feed** where students can share ideas, upload images, and comment anonymously.
+The software architecture consists of a client-server paradigm with real-time bidirectional messaging and third-party authentication integration.
 
 ```mermaid
 graph TD
-    User([Student Client]) -->|Auth & Session| Clerk[Clerk Auth Provider]
-    User -->|HTTP API Requests| Express[Express Server]
-    User -->|Real-time Events| SocketIO[Socket.io Server]
-    Express -->|ORM Queries| Prisma[Prisma ORM]
-    Prisma -->|Storage| PostgreSQL[(PostgreSQL Database)]
-    SocketIO -->|Signaling & Sync| User
+    User([Client Application]) -->|Session & Token Exchange| Clerk[Clerk Authentication Service]
+    User -->|RESTful Operations| Express[Express.js Application Server]
+    User -->|Bidirectional Event Sync| SocketIO[Socket.io Server]
+    Express -->|Prisma Client Queries| PostgreSQL[(PostgreSQL Database)]
+    SocketIO -->|Signaling & State Propagation| User
 ```
 
 ---
 
-## 🚀 Key Features
+## 2. Core Functional Subsystems
 
-### 1. 🔑 Secure Authentication & Onboarding
-* **Clerk Integration:** Instant and secure authentication via Clerk.
-* **Onboarding Flow:** New users are directed to the `/onboarding` screen where they can search and select their specific college.
-* **Smart Search:** Real-time query of Indian colleges seeded directly from institutional registries using a case-insensitive lookup.
+### 2.1 Identity Management and Institutional Affiliation Onboarding
+* **Authentication Provider:** User registration and session state are managed via Clerk. During registration, the client token is verified on the backend, and user state is synchronized.
+* **Institutional Mapping Database:** The system references a collection of Indian academic institutions. This dataset is initialized using the `indian-colleges` schema registry and seeded via database migrations.
+* **Affiliation Resolution:** During onboarding, users complete a case-insensitive query lookup against the `Colleges` table, binding their Postgres `User` record to a specific `collegeId` and `collegeName`.
 
-### 2. 🤝 Study Swap (P2P Matchmaking Engine)
-* **Skill & DSA Swaps:** Students can list what subjects they can teach (e.g., Node.js, Calculus) and what they want to learn (e.g., DBMS, Dynamic Programming).
-* **Urgency & Categorization:** Supports urgency options (Today, Tomorrow, Flexible) and separates listings into Skill or DSA cards.
-* **Real-time Matchmaking:** Clicking "Match" broadcasts a socket event to the poster. They receive an interactive popup modal where they can accept or decline the request.
-* **Room Generation:** Accepting a request immediately instantiates a unique room identifier and redirects both users to the collaborative workspace.
+### 2.2 Peer-to-Peer Matchmaking (Study Swap Engine)
+* **Match Definition:** Users declare learning assets they possess ("offers") and competencies they seek ("needs"), categorized under either generalized skills or Data Structures and Algorithms (DSA).
+* **Asynchronous Match Propagation:** The matching engine uses Socket.io to route direct pairing requests. When a user initiates a match:
+  1. A `request-match` socket event is dispatched to the target socket ID containing the requester's metadata.
+  2. The target client displays a modal allowing prompt acceptance or rejection of the matchmaking request.
+  3. Acceptance triggers an `accept-match` socket event on the server, generating a unique cryptographically pseudorandom room ID (`room${Date.now()}`) and redirecting both clients to the collaborative workspace route `/study-room?room=<roomId>`.
 
-### 3. 🖥️ Interactive Virtual Study Room
-* **Collaborative Whiteboard:** Full-scale integration of `@excalidraw/excalidraw`. Drawing additions, deletions, and updates are synchronized in real-time between participants via Socket.io.
-* **P2P Video & Audio Calling:** Direct video call integration utilizing **WebRTC** signaling. Features camera/mic toggles and an incoming call modal.
-* **Draggable Workspace Layout:** Users can resize the whiteboard and the side panel (chat/video) dynamically via an interactive resizer handle.
-* **Session Chat:** Dedicated text box to message study partners during calls.
+### 2.3 Real-Time Collaborative Study Room
+* **Collaborative Vector Workspace:** Integration of `@excalidraw/excalidraw` for canvas operations. All structural operations (shape addition, stroke adjustments, text modifications) generate a canvas change payload. This payload is intercepted and broadcasted dynamically via socket events (`excalidraw-update`) to synchronize client views without local DB persistence.
+* **WebRTC Signaling and Media Streaming:** Direct peer-to-peer communication is established using `RTCPeerConnection` with the following pipeline:
+  1. The client queries the `stun:stun.l.google.com:19302` STUN server to discover its public-facing IP and port configurations (ICE Candidates).
+  2. Media streams (local camera and microphone input) are resolved via the `navigator.mediaDevices.getUserMedia` API.
+  3. Web socket signaling coordinates the exchange of session descriptions (SDP Offer/Answer) and ICE candidates using signaling paths: `webrtc-offer`, `webrtc-answer`, and `webrtc-ice-candidate`.
+* **Dynamic Layout Engine:** A resizer mechanism monitors workspace pointer movement, recalculating relative flexbox container dimensions to allow resizing of the whiteboard canvas relative to the media/chat panel.
 
-### 4. 📣 Anonymous Campus Feed & Structured Discussions
-* **College Filtering:** Automatically filters feed posts based on the user's registered college, fostering localized discussion.
-* **Media Sharing:** Support for image uploads accompanying posts via backend `multer` middleware.
-* **Structured Comment Threading:** Nested commenting system supporting infinite-depth parent-child replies.
-* **Anonymous Pseudonyms:** Protects student privacy in comment sections by auto-assigning randomized animal names based on user database keys (e.g., `Anon1`, `Beluga2`, `Fox7`).
-* **College Leaderboards:** Shows engagement rankings of top active colleges using raw Postgres aggregate queries (`$queryRaw`).
+### 2.4 Anonymous Campus Feed and Nested Discussions
+* **Affiliation Restrictive Querying:** The backend filters social feed posts based on the `collegeId` attribute of the logged-in user, restricting the visibility of posts to members of the same institution.
+* **Binary Media Processing:** Uploaded post images are handled via `Multer` disk storage configuration, writing incoming streams directly to `/uploads` on the server file system and returning local URLs.
+* **Hierarchical Tree Commenting:** Comments are represented in the relational database as an adjacency list. The `Comment` schema maintains a self-referencing relationship:
+  * A comment may optional link to a `parentId`.
+  * The API fetches comments in linear fashion and processes the result set into a recursive JSON tree, clustering replies under parent objects.
+* **Pseudonymization Algorithm:** To ensure user privacy, usernames are obfuscated in comment sections. A deterministic function evaluates user ID integers against a modulo constraint mapping to a static array of animal handles:
+  $$\text{pseudonym} = \text{animals}[\text{userId} \pmod{\text{len}(\text{animals})}] + \text{userId}$$
+* **Engagement Analytics Leaderboard:** An analytics pipeline evaluates post counts per college using a raw SQL aggregation query (`$queryRaw`) mapping the counts to rank active institutions:
+  ```sql
+  SELECT u."collegeId", COUNT(p.id) as "postCount"
+  FROM "Post" p
+  JOIN "User" u ON p."authorId" = u.id
+  WHERE u."collegeId" IS NOT NULL
+  GROUP BY u."collegeId"
+  ORDER BY "postCount" DESC
+  LIMIT 5
+  ```
 
 ---
 
-## 🛠️ Technology Stack
+## 3. Technology Stack and Dependencies
 
-| Layer | Technologies & Libraries |
-| :--- | :--- |
-| **Frontend** | React 19, Vite, TailwindCSS (v4), React Router Dom (v7), `@clerk/clerk-react` |
-| **Real-time / Media**| Socket.io-client, WebRTC (Simple Peer Signaling), `@excalidraw/excalidraw` |
-| **Backend** | Node.js, Express 5, Socket.io, Multer, `xlsx` (Excel Reader) |
-| **Database & ORM** | PostgreSQL, Prisma ORM (with PG Adapter) |
+| Layer | Dependencies | Details |
+| :--- | :--- | :--- |
+| **Frontend** | React 19, Vite, TailwindCSS (v4), React Router Dom (v7), `@clerk/clerk-react` | Client-side interface rendering, application routing, and authentication wrappers. |
+| **Real-time Engine**| Socket.io-client, RTCPeerConnection (WebRTC), `@excalidraw/excalidraw` | Event-driven socket connections, media negotiation, and canvas serialization. |
+| **Backend API** | Node.js, Express 5, Socket.io, Multer, `xlsx` | HTTP interface routing, media binary uploads, and Excel parsing. |
+| **Database Engine** | PostgreSQL, Prisma Client | Relational data persistence, schema modeling, and raw analytical querying. |
 
 ---
 
-## 📁 Repository Structure
+## 4. Directory Layout
 
 ```
 CLUTCH/
-├── backend/                  # Express API Server & Web Socket Handlers
-│   ├── college_name/         # Excel registry of colleges for seeding
-│   ├── prisma/               # Schema configuration and migrations
+├── backend/                  # Application server and socket handlers
+│   ├── college_name/         # Contains raw institutional registry (Excel sheets)
+│   ├── prisma/               # Database migration files and client schema specifications
 │   ├── src/
-│   │   ├── controllers/      # Route controllers (Post, comment tree logic)
-│   │   ├── middleware/       # Upload and authentication hooks
-│   │   ├── routes/           # REST endpoints (auth, colleges, comments, feed)
-│   │   ├── services/         # Auxiliary utility functions
-│   │   ├── sockets/          # Socket handlers (chat, whiteboard broadcasts)
-│   │   ├── app.js            # Express application initialization
-│   │   └── server.js         # HTTP Server & Socket.io bootstrapper
-│   ├── seed.js               # Database population script (loads Excel data)
+│   │   ├── controllers/      # Route logic for relational models (Posts, nested comments)
+│   │   ├── middleware/       # Middleware functions (Binary file parsing, auth helpers)
+│   │   ├── routes/           # REST endpoints mapping client actions
+│   │   ├── services/         # Auxiliary helpers and algorithms
+│   │   ├── sockets/          # Socket.io connection and message namespaces
+│   │   ├── app.js            # Express application instance declaration
+│   │   └── server.js         # Entrypoint binding Express app and socket server to TCP ports
+│   ├── seed.js               # Database seeding script mapping Excel rows to PostgreSQL
 │   └── package.json
 │
-├── clutch-client/            # Vite + React Frontend Application
+├── clutch-client/            # Client interface application code
 │   ├── public/
 │   ├── src/
-│   │   ├── api/              # API Client helpers & onboarding pages
-│   │   ├── components/       # Shared UI components (Navbar, studyroom sidebar)
-│   │   ├── hooks/            # Custom hooks (WebRTC hook)
-│   │   ├── pages/            # Page-level components (Feed, StudySwap, Room)
-│   │   ├── socket/           # WebSocket socket.io client singleton
-│   │   ├── App.jsx           # Main routing & state provider
-│   │   └── main.jsx          # React entrypoint
+│   │   ├── api/              # API interface abstractions and onboarding views
+│   │   ├── components/       # Core UI component classes (Navigation, study room layout)
+│   │   ├── hooks/            # Custom hooks (WebRTC peer creation, state listeners)
+│   │   ├── pages/            # View managers (Social feed, matchmaking, virtual room)
+│   │   ├── socket/           # WebSocket socket.io client initialization
+│   │   ├── App.jsx           # Client component tree and route configuration
+│   │   └── main.jsx          # React entrypoint mounting DOM node
 │   └── package.json
 │
-├── package.json              # Root-level runner configs
+├── package.json              # Monorepo task configurations
 └── README.md
 ```
 
 ---
 
-## 💾 Database Schema (`Prisma`)
+## 5. Relational Model Schema Specification
 
-CLUTCH leverages a structured relational database schema built in Prisma:
+The relational database is constructed in PostgreSQL via the following Prisma model definition:
 
 ```prisma
 model User {
@@ -149,90 +163,80 @@ model Colleges {
 
 ---
 
-## ⚡ Socket.io Protocol Reference
+## 6. Real-Time Socket Event Protocol
 
-The real-time synchronization layer utilizes standard event payloads over Socket.io:
+Communication over the WebSocket interface executes under the following specific contract:
 
-| Event Name | Direction | Payload | Description |
+| Event Identifier | Data Origin | Payload Signature | Description |
 | :--- | :--- | :--- | :--- |
-| `join-room` | Client ➔ Server | `roomId` | Subscribes socket to target room channel |
-| `send-message` | Client ➔ Server | `{ roomId, text, sender }` | Sends instant message to room participants |
-| `request-match` | Client ➔ Server | `{ targetSocketId, requesterSocketId, requesterName }` | Triggers onboarding popup for the poster |
-| `accept-match` | Client ➔ Server | `{ targetSocketId, requesterSocketId }` | Generates new room ID and forces redirection |
-| `excalidraw-update`| Client ➔ Server | `{ roomId, elements }` | Broadcasts drawing canvas updates in real-time |
-| `webrtc-offer` | Bidirectional | `{ roomId, offer, targetSocketId }` | Signals audio/video connection parameter offer |
-| `webrtc-answer` | Bidirectional | `{ roomId, answer }` | Finalizes peer configuration exchange |
-| `webrtc-ice-candidate`| Bidirectional| `{ roomId, candidate }` | Discovers network pathways between peer hosts |
+| `join-room` | Client ➔ Server | `roomId: string` | Instructs the server to subscribe the socket to the defined room channel. |
+| `send-message` | Client ➔ Server | `{ roomId: string, text: string, sender: string }` | Relays an instant chat message to all connected clients in the room. |
+| `request-match` | Client ➔ Server | `{ targetSocketId: string, requesterSocketId: string, requesterName: string }` | Forwards a matchmaking invitation to the specific target socket. |
+| `accept-match` | Client ➔ Server | `{ targetSocketId: string, requesterSocketId: string }` | Triggers unique channel instantiation and routes target and host to the workspace. |
+| `excalidraw-update`| Client ➔ Server | `{ roomId: string, elements: any[] }` | Broadcasts drawing vector array delta updates to other room participants. |
+| `webrtc-offer` | Bidirectional | `{ roomId: string, offer: RTCSessionDescriptionInit, targetSocketId?: string }` | Initiates WebRTC handshaking by sending the caller's Session Description Protocol parameters. |
+| `webrtc-answer` | Bidirectional | `{ roomId: string, answer: RTCSessionDescriptionInit }` | Complete WebRTC handshaking by returning the receiver's Session Description Protocol parameters. |
+| `webrtc-ice-candidate`| Bidirectional| `{ roomId: string, candidate: RTCIceCandidateInit }` | Disseminates discovered network routing pathways to negotiate network traversal. |
+| `reject-call` | Client ➔ Server | `{ targetSocketId: string }` | Signal that the targeted peer has rejected the incoming stream negotiation. |
+| `call-rejected` | Server ➔ Client | (Empty) | Dispatched to caller indicating session negotiation termination. |
 
 ---
 
-## 🛠️ Setup & Local Development
+## 7. Deployment and Initialization Setup
 
-### 1. Prerequisites
-Ensure you have the following installed:
-* Node.js (v18.x or above)
-* npm (v9.x or above)
-* PostgreSQL Database running locally or on a cloud instance (Supabase, Neon, etc.)
+### 7.1 System Requirements
+* Node.js runtime environment (version >= 18.0.0)
+* npm packager (version >= 9.0.0)
+* PostgreSQL instance
 
----
-
-### 2. Backend Installation & Migration
-
+### 7.2 Database Setup and Migration
 1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
-2. Install the required Node modules:
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Create a `.env` file in the `backend/` directory with your database connection URI:
+3. Initialize the `.env` configuration file inside `backend/`:
    ```env
-   DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<dbname>?schema=public"
+   DATABASE_URL="postgresql://<db_user>:<db_password>@<db_host>:<db_port>/<db_name>?schema=public"
    ```
-4. Run Prisma migrations to initialize the tables in PostgreSQL:
+4. Perform Prisma migration to update PostgreSQL database structure:
    ```bash
    npx prisma migrate dev --name init
    ```
-5. Seed the database with the colleges register (processes the internal Excel workbook `college_codes.xlsx` using Prisma client):
+5. Seed database with the institutional registry via Excel sheet input parsing:
    ```bash
    node seed.js
    ```
 
----
-
-### 3. Frontend Installation
-
+### 7.3 Client Application Setup
 1. Navigate to the client directory:
    ```bash
    cd ../clutch-client
    ```
-2. Install client-side dependencies:
+2. Run package installation:
    ```bash
    npm install
    ```
-3. Create a `.env` file in the `clutch-client/` directory with your Clerk API Publishable Key:
+3. Initialize the client environment configuration file `.env` inside `clutch-client/`:
    ```env
-   VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key_here"
+   VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
    ```
 
----
+### 7.4 Execution Commands
+Run the development servers concurrently in separate terminals:
 
-### 4. Running the Project
-
-For a full local environment, run both servers simultaneously:
-
-* **Start the Express Server (Backend):**
+* **Backend API and WebSocket Instance:**
   ```bash
   cd backend
   npm run dev
-  # Default port: 5000
   ```
-* **Start the Vite Dev Server (Frontend):**
+* **Frontend Vite Service:**
   ```bash
   cd clutch-client
   npm run dev
-  # Default port: 5173
   ```
 
-Once both servers are running, access the application by navigating to [http://localhost:5173](http://localhost:5173) in your web browser. Ensure you sign in/up and complete the onboarding step to see all dashboard capabilities!
+Upon active execution, navigate to `http://localhost:5173`. Ensure authorization steps are completed to allow access to authenticated API endpoints.
