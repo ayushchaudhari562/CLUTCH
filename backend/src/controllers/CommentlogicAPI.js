@@ -43,8 +43,9 @@ const getPostComments = async (req, res) => {
 
     const allComments = await prisma.comment.findMany({
       where: { postId: parseInt(postId) },
-      include: { user: true },
+      include: { user: true,CommentLikes:true },
       orderBy: { createdAt: "asc" },
+
     });
 
     const commentMap = {};
@@ -76,6 +77,8 @@ const getPostComments = async (req, res) => {
         text: comment.content,
         parentId: comment.parentId,
         replies: [],
+        likesCount: comment.CommentLikes ? comment.CommentLikes.length : 0,
+        likedUserIds: comment.CommentLikes ? comment.CommentLikes.map(l => l.userId) : []
       };
     });
 

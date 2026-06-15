@@ -56,7 +56,10 @@ const getAllPosts = async (req, res) => {
     // Posts nikalna (Filter condition ke hisaab se)
     const posts = await prisma.post.findMany({
       where: queryCondition, // Yahan hamara dynamic filter lag raha hai
-      include: { author: true },
+      include: { author: true 
+        ,likes: true
+        
+      },
       orderBy: { createdAt: "desc" },})
     
     const topCollegeData = await prisma.$queryRaw`

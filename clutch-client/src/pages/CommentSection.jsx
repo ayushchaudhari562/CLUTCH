@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 
 const CommentSection = ({ comment, isReply = false }) => {
@@ -11,6 +11,53 @@ const CommentSection = ({ comment, isReply = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [localReplies, setLocalReplies] = useState(comment.replies || []);
   const { user } = useUser();
+  const [dbUser, setDbUser] = useState(null);
+  const [likesCount, setLikesCount] = useState(comment.likesCount || 0);
+  const [likedUserIds, setLikedUserIds] = useState(comment.likedUserIds || []);
+
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:5000/api/user/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setDbUser(data);
+          }
+        })
+        .catch(err => console.error("Error fetching db user details inside CommentSection:", err));
+    }
+  }, [user]);
+
+  const handleCommentLike = async () => {
+    if (!user) {
+      alert("Please login to upvote comments!");
+      return;
+    }
+    if (!dbUser) {
+      alert("User profile is loading, please wait.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/comments/${comment.id}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerkId: user.id })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        if (data.liked) {
+          setLikesCount(prev => prev + 1);
+          setLikedUserIds(prev => [...prev, dbUser.id]);
+        } else {
+          setLikesCount(prev => prev - 1);
+          setLikedUserIds(prev => prev.filter(uid => uid !== dbUser.id));
+        }
+      }
+    } catch (error) {
+      console.error("Failed to toggle comment like:", error);
+    }
+  };
 
   const handleEditSave = () => {
     fetch(`http://localhost:5000/api/comments/${comment.id}`, {
@@ -51,7 +98,9 @@ const CommentSection = ({ comment, isReply = false }) => {
            author: `${animals[id % animals.length]}${id}`,
            text: newReply.content,
            parentId: newReply.parentId,
-           replies: []
+           replies: [],
+           likesCount: 0,
+           likedUserIds: []
         };
         
         setLocalReplies(prev => [...prev, formattedReply]);
@@ -113,12 +162,20 @@ const CommentSection = ({ comment, isReply = false }) => {
               <button onClick={() => setIsCollapsed(true)} className="flex items-center justify-center w-[18px] h-[18px] rounded-full border border-[#343536] hover:border-gray-300 text-[#343536] hover:text-gray-300 transition-colors mr-1 cursor-pointer" title="Collapse">
                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M20 12H4"></path></svg>
               </button>
-           
-              <button className="flex items-center gap-1 hover:bg-[#2a2a2b] p-1.5 rounded transition-colors group cursor-pointer">
-                <svg className="w-5 h-5 group-hover:text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path></svg>
-              </button>
-              <span className="font-medium text-[13px]">6</span>
-              <button className="flex items-center gap-1 hover:bg-[#2a2a2b] p-1.5 rounded transition-colors group cursor-pointer">
+                         <button 
+                onClick={handleCommentLike} 
+                className={`flex items-center gap-1 hover:bg-[#2a2a2b] p-1.5 rounded transition-colors group cursor-pointer ${
+                  dbUser && likedUserIds.includes(dbUser.id) ? "text-orange-500" : "text-gray-400"
+                }`}
+               >
+                 <svg className="w-5 h-5 group-hover:text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path></svg>
+               </button>
+               <span className={`font-medium text-[13px] ${
+                 dbUser && likedUserIds.includes(dbUser.id) ? "text-orange-500" : "text-gray-400"
+               }`}>
+                 {likesCount}
+               </span>
+               <button className="flex items-center gap-1 hover:bg-[#2a2a2b] p-1.5 rounded transition-colors group cursor-pointer">
                 <svg className="w-5 h-5 group-hover:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               

@@ -1,11 +1,27 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import FeedPost from '../components/campus-feed/Feed-post';
 
 const CampusFeed = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useUser();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [dbUser, setDbUser] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:5000/api/user/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setDbUser(data);
+          }
+        })
+        .catch(err => console.error("Error fetching database user details:", err));
+    }
+  }, [user]);
 
   //..
   //..
@@ -48,6 +64,45 @@ const CampusFeed = () => {
       localStorage.setItem('recentlyViewedPosts', JSON.stringify(updatedHistory));
       return updatedHistory;
     });
+  };
+
+  const handlePostLike = async (postId, e) => {
+    e.stopPropagation();
+    if (!user) {
+      alert("Please login to upvote posts!");
+      return;
+    }
+    if (!dbUser) {
+      alert("User profile loading, please wait.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerkId: user.id })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setPosts(prevPosts => 
+          prevPosts.map(p => {
+            if (p.id === parseInt(postId)) {
+              let updatedLikes = [...(p.likes || [])];
+              if (data.liked) {
+                updatedLikes.push({ userId: dbUser.id, postId: p.id });
+              } else {
+                updatedLikes = updatedLikes.filter(like => like.userId !== dbUser.id);
+              }
+              return { ...p, likes: updatedLikes };
+            }
+            return p;
+          })
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle post like:", error);
+    }
   };
   useEffect(() => {
     const fetchPosts = async () => {
@@ -196,10 +251,19 @@ const CampusFeed = () => {
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2d2d2d]">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                      <button className="text-gray-500 hover:text-indigo-400 p-1 rounded transition-colors">
+                      <button 
+                        onClick={(e) => handlePostLike(post.id, e)}
+                        className={`p-1 rounded transition-colors cursor-pointer ${
+                          post.likes && dbUser && post.likes.some(like => like.userId === dbUser.id)
+                            ? "text-orange-500 hover:text-orange-600"
+                            : "text-gray-500 hover:text-indigo-400"
+                        }`}
+                      >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
                       </button>
-                      <span className="text-gray-400 font-medium text-sm">0</span>
+                      <span className="text-gray-400 font-medium text-sm">
+                        {post.likes ? post.likes.length : 0}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -235,9 +299,9 @@ const CampusFeed = () => {
             <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-4">ACTIVE NOW</h2>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-              <span className="text-gray-200 text-sm font-medium">142 students online</span>
+              <span className="text-gray-200 text-sm font-medium">{Math.floor(Math.random() * 10) + 11} students online</span>
             </div>
-            <p className="text-gray-400 text-xs ml-4.5">23 from your college</p>
+            <p className="text-gray-400 text-xs ml-4.5">{Math.floor(Math.random() * 5) + 5} from your college</p>
           </div>
         </div>
 

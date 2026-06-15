@@ -90,7 +90,9 @@ const CommentMain = () => {
             author: `${animals[id % animals.length]}${id}`,
             text: newComment.content,
             parentId: newComment.parentId,
-            replies: []
+            replies: [],
+            likesCount: 0,
+            likedUserIds: []
         };
 
         // Optimized UI update: append new comment directly without a second fetch
@@ -204,6 +206,13 @@ const CommentMain = () => {
               <h1 className="text-xl font-bold text-gray-100 mb-3">
                 {post.title}
               </h1>
+              {post.imageUrl && (
+                <img 
+                  src={`http://localhost:5000${post.imageUrl}`} 
+                  alt="Post content" 
+                  className="w-full max-h-[500px] object-contain rounded-lg mb-4 border border-[#2d2d2d]"
+                />
+              )}
               <p className="text-gray-300 leading-relaxed text-[15px]">
                 {post.content}
               </p>
