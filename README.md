@@ -39,9 +39,108 @@ The platform consists of a React client Single Page Application (SPA), an event-
 
 ---
 
-## 2. Low-Level System Flow Sequences
+## 2. End-to-End System Execution Flow Chart
 
-### 2.1 Onboarding and Profile Association Flow
+This diagram charts the logical execution flow of the entire CLUTCH application lifecycle, detailing routing paths, controller interventions, and signaling transitions.
+
+```mermaid
+flowchart TD
+    Start([Student Opens Platform]) --> Auth{Session Token Valid?}
+    
+    Auth -- No --> SignModal[Clerk Authentication Modal] --> SignSuccess[Verify Session & Emit JWT] --> NewUser{Profile Exists in DB?}
+    Auth -- Yes --> HomeRoute[Redirect to Home Route /]
+    
+    NewUser -- No --> Onboard[Route to Onboarding Screen /onboarding]
+    NewUser -- Yes --> HomeRoute
+    
+    Onboard --> QueryColleges[Search Box: Fetch matching colleges]
+    QueryColleges --> REST1[GET /api/colleges?search=keyword]
+    REST1 --> DBColleges[(Colleges Table Query)]
+    DBColleges --> ReturnColleges[Display filtered institutional list]
+    
+    ReturnColleges --> SelectCollege[User Selects Institution]
+    SelectCollege --> REST2[POST /api/save-college]
+    REST2 --> DBUserUpsert[Prisma upsert binds Clerk ID to College ID]
+    DBUserUpsert --> SetAffiliation[Assign collegeName and collegeId to User record]
+    SetAffiliation --> HomeRoute
+    
+    %% Main Dashboard Division
+    HomeRoute --> Dashboard{Select Platform Module}
+    
+    %% Pathway A: Social Feed
+    Dashboard -->|Social Hub| FeedRoute[Route to /campus-feed]
+    FeedRoute --> LoadFeed[GET /api/feed/all?collegeId=X]
+    LoadFeed --> QueryPosts[Prisma filters posts matching user collegeId]
+    QueryPosts --> SQLRank[queryRaw aggregates active post counts per institution]
+    SQLRank --> RenderFeed[Render post list and institutional leaderboard]
+    
+    RenderFeed --> NewPost[User creates a post]
+    NewPost --> FileInput{Has image attachment?}
+    FileInput -- Yes --> FormPayload[Append text & binary to FormData] --> MulterDir[Post /api/feed/create via Multer filesystem write] --> DBPost[Insert Post record with imageUrl pointer]
+    FileInput -- No --> PostPayload[POST content payload] --> DBPost
+    
+    RenderFeed --> ViewComments[User expands comments section /post/:postId]
+    ViewComments --> GETComments[GET /api/comments/:postId]
+    GETComments --> DBComments[(Comments Table Select)]
+    DBComments --> ModAlgorithm[Compute user ID modulo for animal handles: getAnonymousName]
+    ModAlgorithm --> TreeTransformer[Map flat adjacency list comments into recursive JSON tree]
+    TreeTransformer --> RenderComments[Display nested threaded comments tree]
+    
+    %% Pathway B: Study Swap Matchmaker
+    Dashboard -->|Study Swap Engine| SwapRoute[Route to /study-swap]
+    SwapRoute --> PostSwap[User posts swap request offer, need, category, urgency]
+    PostSwap --> BindSocket[Bind active socket.id to Swap record in state]
+    
+    SwapRoute --> BrowseSwaps[Peer browses DSA & Skill swap cards]
+    BrowseSwaps --> InitiateMatch[Peer clicks Match on Target Card]
+    InitiateMatch --> WebSocketMatch[Emit request-match with target socket.id & requester metadata]
+    WebSocketMatch --> HostModal[Relay incoming-match-request to Host UI]
+    HostModal --> HostDecision{Host accepts match?}
+    
+    HostDecision -- No --> TerminateMatch[Close matchmaking modal]
+    HostDecision -- Yes --> AcceptSocket[Emit accept-match from Host]
+    AcceptSocket --> CreateRoom[Server instantiates Room ID: room_timestamp]
+    CreateRoom --> SocketRedirect[Emit match-accepted to both clients]
+    SocketRedirect --> RoomRoute[Redirect both clients to /study-room?room=roomId]
+    
+    %% Pathway C: Virtual Study Room
+    Dashboard -->|Virtual Workspace Direct Access| RoomRoute
+    RoomRoute --> JoinChannel[Emit join-room subscribing socket to room channel]
+    JoinChannel --> MediaAccess[Request hardware access: getUserMedia]
+    
+    %% WebRTC sub-flow
+    MediaAccess --> RTCStart[Create RTCPeerConnection & register local tracks]
+    RTCStart --> STUNQuery[Query STUN server stun.l.google.com to discover NAT IPs]
+    STUNQuery --> GenerateIce[onicecandidate triggers webrtc-ice-candidate signaling exchange]
+    
+    RTCStart --> UserJoinSignal[Listen to user-joined event]
+    UserJoinSignal --> SignalSDP[Handshake: Create Offer SDP -> setLocalDescription -> emit webrtc-offer]
+    SignalSDP --> AcceptSDP[Peer receives offer -> setRemoteDescription -> Create Answer SDP -> emit webrtc-answer]
+    AcceptSDP --> RemoteDescription[Host receives answer -> setRemoteDescription]
+    
+    GenerateIce & RemoteDescription --> P2PConnected[WebRTC Peer-to-Peer UDP direct stream established]
+    
+    %% Collaboration / Canvas features inside room
+    RoomRoute --> CanvasInit[Initialize Excalidraw Engine]
+    CanvasInit --> CanvasChange[Stroke/drawing event occurs]
+    CanvasChange --> CycleCheck{Triggered by network socket event?}
+    CycleCheck -- Yes --> SkipLoop[Reset isUpdatingFromSocket flag and end iteration]
+    CycleCheck -- No --> DebounceCanvas[Debounce element update payload for 30ms]
+    DebounceCanvas --> EmitCanvas[Emit excalidraw-update to room channel]
+    EmitCanvas --> BroadcastCanvas[Server broadcasts coordinates to other peer sockets]
+    
+    RoomRoute --> ChatPanelInit[Initialize Chat panel]
+    ChatPanelInit --> SendMessage[User sends chat text]
+    SendMessage --> EmitMessage[Emit send-message with roomId]
+    EmitMessage --> ServerChat[Server broadcasts receive-message to room]
+    ServerChat --> MessageBubbleMemo[MessageBubble React.memo updates UI bubble list]
+```
+
+---
+
+## 3. Core Functional Subsystems Detailed Sequence Flows
+
+### 3.1 Onboarding and Profile Association Flow
 This flow creates a user record in the local database and links it to an verified college ID during their first login.
 
 ```mermaid
@@ -66,7 +165,7 @@ sequenceDiagram
     Client->>Client: React Router redirects user to campus feed (/campus-feed)
 ```
 
-### 2.2 Peer Matchmaking Flow (Study Swap Engine)
+### 3.2 Peer Matchmaking Flow (Study Swap Engine)
 This flow connects two active peer sockets, creates a virtual room, and redirects both users to a shared workspace.
 
 ```mermaid
@@ -93,7 +192,7 @@ sequenceDiagram
     end
 ```
 
-### 2.3 Collaborative Study Room & WebRTC Connection Flow
+### 3.3 Collaborative Study Room & WebRTC Connection Flow
 Once redirected to `/study-room`, this flow establishes the peer-to-peer media stream and coordinates the shared Excalidraw whiteboard.
 
 ```mermaid
@@ -137,7 +236,7 @@ sequenceDiagram
     Note over ClientB: Update scene elements (skips loopback update)
 ```
 
-### 2.4 Campus Feed, Leaderboard & Discussion Tree Flow
+### 3.4 Campus Feed, Leaderboard & Discussion Tree Flow
 This flow maps social feeds, calculates college leaderboards via raw SQL, and resolves flat comments into a nested tree structure.
 
 ```mermaid
@@ -162,7 +261,7 @@ sequenceDiagram
 
 ---
 
-## 3. Technology Stack and Dependencies
+## 4. Technology Stack and Dependencies
 
 | Layer | Dependencies | Details |
 | :--- | :--- | :--- |
@@ -173,11 +272,11 @@ sequenceDiagram
 
 ---
 
-## 4. Detailed Repository and Directory Architecture
+## 5. Detailed Repository and Directory Architecture
 
 The system is configured as a client-server project containing isolated backend and frontend workspaces. Below is the itemized breakdown of structural files and directories, clarifying files, logic layers, and internal components.
 
-### 4.1 Backend Project Directory (`/backend`)
+### 5.1 Backend Project Directory (`/backend`)
 
 The backend codebase manages HTTP routing, WebSocket event handlers, relational database connectivity, and administrative setup scripts.
 
@@ -212,7 +311,7 @@ The backend codebase manages HTTP routing, WebSocket event handlers, relational 
 
 ---
 
-### 4.2 Frontend Client Directory (`/clutch-client`)
+### 5.2 Frontend Client Directory (`/clutch-client`)
 
 The frontend application code builds pages and components inside a single-page app framework.
 
@@ -260,7 +359,7 @@ The frontend application code builds pages and components inside a single-page a
 
 ---
 
-## 5. Relational Model Schema Specification
+## 6. Relational Model Schema Specification
 
 The relational database is constructed in PostgreSQL via the following Prisma model definition:
 
@@ -323,11 +422,11 @@ model Colleges {
 
 ---
 
-## 6. Sockets Protocol Reference
+## 7. Sockets Protocol Reference
 
 WebSocket operations implement strict interfaces mapping directly to the backend signaling handlers:
 
-| Event Namespace | Direct Origin | Payload Signature | Functional Operation |
+| Event Namespace | Direct Origin | Payload Signature | Description |
 | :--- | :--- | :--- | :--- |
 | `join-room` | Client ➔ Server | `roomId: string` | Registers client socket descriptor into the targeted virtual room. |
 | `send-message` | Client ➔ Server | `{ roomId: string, text: string, sender: string }` | Transmits text packet to active room socket channels. |
@@ -342,9 +441,9 @@ WebSocket operations implement strict interfaces mapping directly to the backend
 
 ---
 
-## 7. Developer Environment Setup
+## 8. Developer Environment Setup
 
-### 7.1 Database Initialization
+### 8.1 Database Initialization
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -366,7 +465,7 @@ WebSocket operations implement strict interfaces mapping directly to the backend
    node seed.js
    ```
 
-### 7.2 Frontend Initialization
+### 8.2 Frontend Initialization
 1. Navigate to the client directory:
    ```bash
    cd ../clutch-client
@@ -380,7 +479,7 @@ WebSocket operations implement strict interfaces mapping directly to the backend
    VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
    ```
 
-### 7.3 Development Execution
+### 8.3 Development Execution
 Spawn both application servers concurrently:
 
 * **API & WebSocket Signaling Instance (Backend):**
