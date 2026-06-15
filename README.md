@@ -8,15 +8,6 @@ This manual provides a highly detailed specification of the network topology, sy
 
 The platform consists of a React client Single Page Application (SPA), an event-driven Express.js API server, a stateful Socket.io signaling server, and a PostgreSQL database. Communication uses three distinct networking protocols and port mappings:
 
-```
-[ Client Browser Sandbox ]
-      |
-      +--- HTTPS (TCP 5000) ------------> [ Express REST API Engine ] ---- [ Prisma ORM ] ---- [ PostgreSQL (TCP 5432) ]
-      |
-      +--- WS/WSS (TCP 5000) -----------> [ Socket.io WebSockets ]
-      |
-      +--- WebRTC Data Plane (UDP) ----> [ Peer Client Browser Sandbox ] (Direct connection routed via STUN lookup)
-```
 
 ### 1.1 Client Runtime Architecture
 * **Interface Layer:** Powered by React 19 and compiled via Vite.
