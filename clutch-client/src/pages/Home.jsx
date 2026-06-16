@@ -56,7 +56,7 @@ const Home = ({ swaps = [] }) => {
 
   const handleMatch = (swap) => {
     socket.emit("request-match", {
-      targetSocketId: swap.socketId,
+      targetUserId: swap.userId,
       requesterSocketId: socket.id,
       requesterName: user ? user.username || user.fullName || "Clutch User" : "Users--requesting"
     });
