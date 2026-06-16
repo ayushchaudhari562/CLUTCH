@@ -17,7 +17,7 @@ const CommentSection = ({ comment, isReply = false }) => {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -39,7 +39,7 @@ const CommentSection = ({ comment, isReply = false }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/comments/${comment.id}/like`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/comments/${comment.id}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clerkId: user.id })
@@ -60,7 +60,7 @@ const CommentSection = ({ comment, isReply = false }) => {
   };
 
   const handleEditSave = () => {
-    fetch(`http://localhost:5000/api/comments/${comment.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/comments/${comment.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: editValue })
@@ -74,7 +74,7 @@ const CommentSection = ({ comment, isReply = false }) => {
 
   const handlePostReply = () => {
     if(!replyText.trim()) return;
-    fetch(`http://localhost:5000/api/comments`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

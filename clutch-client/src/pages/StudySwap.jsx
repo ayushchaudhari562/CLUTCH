@@ -18,7 +18,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   useEffect(() => {
     // Only fetching user data here now, socket logic moved to App.jsx
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.collegeName) {
@@ -43,7 +43,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const handleDelete = async (swapId) => {
     if (!window.confirm("Are you sure you want to delete this swap?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/swaps/${swapId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/swaps/${swapId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -72,7 +72,7 @@ const StudySwap = ({ swaps = [], addSwap }) => {
     const finalCategory = dsa === "1" ? "skill" : "dsa";
 
     try {
-      const response = await fetch("http://localhost:5000/api/swaps", {
+      const response = await fetch(import.meta.env.VITE_API_URL + "/api/swaps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

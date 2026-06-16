@@ -37,7 +37,7 @@ const AppContent = ({ swaps, setSwaps }) => {
   useEffect(() => {
     if (user && user.id) {
       // Sync Clerk fullName to Prisma username automatically
-      fetch("http://localhost:5000/api/sync-user", {
+      fetch(import.meta.env.VITE_API_URL + "/api/sync-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -50,7 +50,7 @@ const AppContent = ({ swaps, setSwaps }) => {
   }, [user]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/swaps")
+    fetch(import.meta.env.VITE_API_URL + "/api/swaps")
       .then(res => res.json())
       .then(data => {
         if(Array.isArray(data)) {

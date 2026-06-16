@@ -42,7 +42,7 @@ const Feedpost = ({ onClose }) => {
             }
 
             // Send POST request to backend multer endpoint
-            const response = await fetch('http://localhost:5000/api/feed/create', {
+            const response = await fetch(import.meta.env.VITE_API_URL + '/api/feed/create', {
                 method: 'POST',
                 // Note: Do NOT set Content-Type header manually when using FormData
                 body: formData

@@ -15,7 +15,7 @@ const Home = ({ swaps = [] }) => {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (data.collegeName) {

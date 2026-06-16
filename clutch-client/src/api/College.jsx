@@ -32,7 +32,7 @@ const CollegeSelector = () => {
         // ...
         // Step 1: Hum apne Express backend ko bol rahe hain: "Bhai, jo search query hai uske matching colleges de do"
         // ...
-        fetch(`http://localhost:5000/api/colleges?search=${search}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/colleges?search=${search}`)
             .then(res => res.json())
             .then(data => {
                 // ...
@@ -53,7 +53,7 @@ const CollegeSelector = () => {
         // ...
         // Step 3: Jab user kisi college par click kare, to usko database mein save karo
         // ...
-        await fetch("http://localhost:5000/api/save-college", {
+        await fetch(import.meta.env.VITE_API_URL + "/api/save-college", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 

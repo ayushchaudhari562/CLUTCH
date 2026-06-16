@@ -12,7 +12,7 @@ const CampusFeed = () => {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -78,7 +78,7 @@ const CampusFeed = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}/like`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/post/${postId}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clerkId: user.id })
@@ -108,8 +108,8 @@ const CampusFeed = () => {
     const fetchPosts = async () => {
       try {
         const url = selectedCollegeId
-          ? `http://localhost:5000/api/feed/all?collegeId=${selectedCollegeId}`
-          : `http://localhost:5000/api/feed/all`;
+          ? `/api/feed/all?collegeId=${selectedCollegeId}`
+          : `/api/feed/all`;
 
         fetch(url)// i will add comment later here ig i need more change here y
           .then(res => res.json())
@@ -243,7 +243,7 @@ const CampusFeed = () => {
                 {/* Image Rendering */}
                 {post.imageUrl && (
                   <img
-                    src={`http://localhost:5000${post.imageUrl}`}
+                    src={post.imageUrl.startsWith("http") ? post.imageUrl : `${import.meta.env.VITE_API_URL}${post.imageUrl}`}
                     alt="Post content"
                     className="w-full max-h-96 object-cover rounded-[12px] mb-4 border border-white/5"
                   />

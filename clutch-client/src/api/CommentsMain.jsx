@@ -39,7 +39,7 @@ const CommentMain = () => {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -62,7 +62,7 @@ const CommentMain = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}/like`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/post/${postId}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clerkId: user.id })
@@ -93,7 +93,7 @@ const CommentMain = () => {
 
   useEffect(() => {
     
-    fetch(`http://localhost:5000/api/comments/${postId}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/comments/${postId}`)
       .then((res) => res.json())
       .then((data) => {
         setComments(data);
@@ -106,7 +106,7 @@ const CommentMain = () => {
 //..
     //Fetch sidebar colleges
     //...
-    fetch(`http://localhost:5000/api/feed/all`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/feed/all`)
       .then((res) => res.json())
       .then((data) => {
         setSidebarColleges(data.topColleges || []);
@@ -116,7 +116,7 @@ const CommentMain = () => {
   const handlePostComment = () => {
     if (!newCommentText.trim()) return;
 
-    fetch(`http://localhost:5000/api/comments`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -159,7 +159,7 @@ const CommentMain = () => {
   const handleDeletePost = async () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/post/${postId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -283,7 +283,7 @@ const CommentMain = () => {
               </div>
               {post.imageUrl && (
                 <img 
-                  src={`http://localhost:5000${post.imageUrl}`} 
+                  src={post.imageUrl.startsWith("http") ? post.imageUrl : `${import.meta.env.VITE_API_URL}${post.imageUrl}`} 
                   alt="Post content" 
                   className="w-full max-h-[500px] object-contain rounded-[12px] mb-4 border border-white/5"
                 />

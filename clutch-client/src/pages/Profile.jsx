@@ -15,7 +15,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/user/${user.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -32,7 +32,7 @@ const Profile = () => {
     if (!dbUser) return;
     (async () => {
       try {
-        const resp = await fetch('http://localhost:5000/api/feed/all');
+        const resp = await fetch(import.meta.env.VITE_API_URL + '/api/feed/all');
         const json = await resp.json();
         const allPosts = json.posts || [];
 
@@ -43,7 +43,7 @@ const Profile = () => {
         setPostLikesCount(postsLikes);
 
         // fetch comments authored by this db user to compute comment likes
-        const cResp = await fetch(`http://localhost:5000/api/comments/user/${dbUser.id}`);
+        const cResp = await fetch(`${import.meta.env.VITE_API_URL}/api/comments/user/${dbUser.id}`);
         if (cResp.ok) {
           const userComments = await cResp.json();
           const cLikes = userComments.reduce((s, c) => s + (c.likesCount || 0), 0);
@@ -72,7 +72,7 @@ const Profile = () => {
   const saveCollege = async () => {
     if (!user) return;
     try {
-      const resp = await fetch('http://localhost:5000/api/save-college', {
+      const resp = await fetch(import.meta.env.VITE_API_URL + '/api/save-college', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clerkId: user.id, collegeName: collegeInput })
