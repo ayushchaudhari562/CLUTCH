@@ -2,7 +2,7 @@
   "name": "clutch-root",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "autocommit": "npx nodemon --watch . --ext js,jsx,ts,json,prisma,html,css --exec \"git add . && git commit -m 'Auto-commit' && git push || exit 0\""
-  }
+  // "scripts": {
+  //   "autocommit": "npx nodemon --watch . --ext js,jsx,ts,json,prisma,html,css --exec \"git add . && git commit -m 'Auto-commit' && git push || exit 0\""
+  // }
 }
