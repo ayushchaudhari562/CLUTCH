@@ -4,7 +4,7 @@ module.exports = (io) => {
 
     socket.on("register", (userId) => {
       socket.join(userId);
-      console.log(`User registered: ${userId}`);
+      console.log(`User registered successfully. Socket ID: ${socket.id}, User ID Room: ${userId}`);
     });
 
     socket.on("join-room", (roomId) => {
@@ -20,8 +20,10 @@ module.exports = (io) => {
     //.....
     //if someone is click on match than this will take us call this 
     socket.on("request-match", (data) => {
+      console.log(`Backend: request-match event received from Socket: ${socket.id}. Requester: ${data.requesterName}. Target User ID: ${data.targetUserId}`);
       // Emit to the target user's ID room (which they joined on register)
       io.to(data.targetUserId).emit("incoming-match-request", data);
+      console.log(`Backend: Forwarded incoming-match-request to User ID Room: ${data.targetUserId}`);
     });
     //now for person who had posted will decide to 
     // accept or reject it
