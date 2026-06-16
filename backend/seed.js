@@ -10,7 +10,10 @@ const xlsx = require('xlsx');
 const path = require('path');
 
 const connectionString = process.env.DATABASE_URL;
-const pool = new Pool({ connectionString });
+const pool = new Pool({
+    connectionString,
+    ssl: connectionString.includes("localhost") ? false : { rejectUnauthorized: false }
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
