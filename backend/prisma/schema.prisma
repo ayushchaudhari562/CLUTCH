@@ -32,6 +32,7 @@ model User {
   likes         Like[]
   comments      Comment[]
   CommentLikes  CommentLike[]
+  swaps         Swap[]
 }
 
 
@@ -75,3 +76,13 @@ model CommentLike {
   @@unique([commentId, userId])
 }
 
+model Swap {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  offer     String
+  need      String
+  urgency   String   // "Today", "Tomorrow", "Next Week", "Flexible"
+  category  String   // "skill" or "dsa"
+  createdAt DateTime @default(now())
+}

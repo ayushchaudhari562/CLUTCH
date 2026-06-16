@@ -71,33 +71,33 @@ const CollegeSelector = () => {
     };
 
     return(
-        <div className="p-8 max-w-lg mx-auto mt-20">
-            <h1 className="text-2xl font-bold mb-4">Which college do you attend?</h1>
+        <div className="p-8 max-w-lg mx-auto mt-24 bg-[#12141C] rounded-[12px] border border-white/5 text-white shadow-none font-sans">
+            <h1 className="text-xl font-bold text-white mb-4">Which college do you attend?</h1>
             
             <input 
                 type="text" 
                 placeholder="Search College..." 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                className="w-full p-2 border rounded mb-4 text-black"
+                className="w-full bg-[#090A0F] text-white placeholder-[#6B7280] border border-white/5 rounded-[8px] p-3 mb-4 focus:outline-none focus:border-[#10b981] transition-colors"
             />
 
-            {isLoading && <p className="text-gray-500 mb-2">Searching database...</p>}
+            {isLoading && <p className="text-[#6B7280] mb-2 text-sm">Searching database...</p>}
 
-            <ul className="bg-white shadow rounded overflow-hidden max-h-80 overflow-y-auto text-black">
+            <ul className="bg-[#090A0F] border border-white/5 rounded-[8px] overflow-hidden max-h-80 overflow-y-auto text-white list-none p-0 m-0">
                 {allColleges.map((college) => (
                     <li 
                         key={college.id} 
                         onClick={() => handleSelectCollege(college.name)}
-                        className="p-3 border-b hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                        className="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer flex items-center justify-between text-sm transition-colors duration-150"
                     >
-                        <span>{college.name}</span>
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">Code: {college.id}</span>
+                        <span className="text-white font-medium">{college.name}</span>
+                        <span className="text-[10px] text-[#6B7280] bg-white/5 px-2.5 py-0.5 rounded-[6px]">Code: {college.id}</span>
                     </li>
                 ))}
                 
                 {allColleges.length === 0 && !isLoading && (
-                    <li className="p-3 text-gray-500">No colleges found.</li>
+                    <li className="p-3 text-[#6B7280] text-sm">No colleges found.</li>
                 )}
             </ul>
         </div>

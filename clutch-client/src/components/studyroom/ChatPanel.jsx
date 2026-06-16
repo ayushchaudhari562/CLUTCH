@@ -9,21 +9,19 @@ import socket from "../../socket/socket";
 //      new bubble gets mounted — the other 79 are untouched.
 const MessageBubble = React.memo(({ msg }) => (
   <div
-    className={`flex flex-col gap-1 max-w-[85%] ${
-      msg.isMe ? "self-end" : "self-start"
-    }`}
+    className={`flex flex-col gap-1 max-w-[85%] ${msg.isMe ? "self-end" : "self-start"
+      }`}
   >
     {!msg.isMe && (
-      <span className="text-[10px] text-neutral-500 font-medium px-1">
+      <span className="text-[10px] text-[#6B7280] font-medium px-1">
         {msg.sender}
       </span>
     )}
     <div
-      className={`px-3 py-2 text-[13px] shadow-sm leading-relaxed ${
-        msg.isMe
-          ? "bg-purple-600/90 text-white rounded-2xl rounded-tr-sm"
-          : "bg-neutral-800 text-gray-200 rounded-2xl rounded-tl-sm"
-      }`}
+      className={`px-3 py-2 text-[13px] shadow-none leading-relaxed ${msg.isMe
+          ? "bg-emerald-500/10 text-[#10b981] rounded-2xl rounded-tr-sm border border-emerald-500/20"
+          : "bg-[#090A0F] text-white rounded-2xl rounded-tl-sm border border-white/5"
+        }`}
     >
       {msg.text}
     </div>
@@ -173,7 +171,7 @@ const ChatPanel = ({ roomId }) => {
   );
 
   return (
-    <div className="flex-1 bg-[#141414] rounded-xl border border-neutral-800 flex flex-col overflow-hidden min-h-0">
+    <div className="flex-1 bg-[#12141C] rounded-[12px] border border-white/5 flex flex-col overflow-hidden min-h-0 shadow-none">
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
         {messages.map((msg) => (
           // OPTIMIZATION: Using the memoized MessageBubble instead of inline JSX.
@@ -187,18 +185,18 @@ const ChatPanel = ({ roomId }) => {
           The form handles Enter-key submission natively without extra keyDown listeners. */}
       <form
         onSubmit={handleSendMessage}
-        className="p-2 border-t border-neutral-800 bg-[#141414] flex gap-2"
+        className="p-2 border-t border-white/5 bg-[#12141C] flex gap-2"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Message room..."
-          className="flex-1 bg-neutral-800/50 rounded-lg text-[13px] text-gray-200 placeholder-neutral-500 focus:outline-none px-3 py-2 border border-neutral-800 focus:border-neutral-700 transition"
+          className="flex-1 bg-[#090A0F] rounded-[8px] text-[13px] text-white placeholder-[#6B7280] focus:outline-none px-3 py-2 border border-white/5 focus:border-[#10b981] transition-colors"
         />
         <button
           type="submit"
-          className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition flex items-center justify-center shrink-0"
+          className="p-2 bg-[#10b981] hover:bg-[#059669] text-white rounded-[8px] transition-colors flex items-center justify-center shrink-0 border-0 shadow-none cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

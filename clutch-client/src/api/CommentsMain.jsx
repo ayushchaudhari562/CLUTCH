@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import CommentSection from "../pages/CommentSection";
+import FeedPost from '../components/campus-feed/Feed-post';
 
 const CommentMain = () => {
   const { postId } = useParams();
@@ -26,7 +27,8 @@ const CommentMain = () => {
   //..
   //...
 
-  const [post] = useState(
+  const [dbUser, setDbUser] = useState(null);
+  const [post, setPost] = useState(
     location.state?.post || {
       id: postId,
       title: "Loading...",
@@ -34,6 +36,53 @@ const CommentMain = () => {
       author: "Unknown",
     },
   );
+
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:5000/api/user/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setDbUser(data);
+          }
+        })
+        .catch(err => console.error("Error resolving user profile in CommentsMain:", err));
+    }
+  }, [user]);
+
+  const handlePostLike = async (postId, e) => {
+    e.stopPropagation();
+    if (!user) {
+      alert("Please login to upvote posts!");
+      return;
+    }
+    if (!dbUser) {
+      alert("User profile loading, please wait.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerkId: user.id })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setPost(prevPost => {
+          let updatedLikes = [...(prevPost.likes || [])];
+          if (data.liked) {
+            updatedLikes.push({ userId: dbUser.id, postId: prevPost.id });
+          } else {
+            updatedLikes = updatedLikes.filter(like => like.userId !== dbUser.id);
+          }
+          return { ...prevPost, likes: updatedLikes };
+        });
+      }
+    } catch (error) {
+      console.error("Failed to toggle post like:", error);
+    }
+  };
 
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,21 +158,21 @@ const CommentMain = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#0d0d0d] text-gray-100 p-4 md:p-6 lg:px-12 font-sans pt-24">
+      <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans pt-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
           
           <div className="hidden md:block md:col-span-3 space-y-6">
-            <div className="bg-[#1c1c1c] rounded-xl p-4 border border-[#2d2d2d]">
-              <h2 className="text-gray-400 text-xs font-semibold tracking-wider mb-3">
+            <div className="bg-[#12141C] rounded-[12px] p-4 border border-white/5 shadow-none">
+              <h2 className="text-[#6B7280] text-[11px] font-semibold tracking-wider mb-3 uppercase">
                 COLLEGE
               </h2>
               <ul className="space-y-1">
                 <li
                   onClick={() => handleCollegeClick(null)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[#252525]`}
+                  className="flex items-center justify-between px-3 py-2 rounded-[8px] cursor-pointer transition-colors hover:bg-white/5 text-[#6B7280]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-400">
+                    <div className="text-[#10b981]">
                       <svg
                         className="w-5 h-5"
                         fill="none"
@@ -138,7 +187,7 @@ const CommentMain = () => {
                         ></path>
                       </svg>
                     </div>
-                    <span className="font-medium text-gray-300">
+                    <span className="font-medium text-[#6B7280] hover:text-white">
                       Global Feed
                     </span>
                   </div>
@@ -148,10 +197,10 @@ const CommentMain = () => {
                   <li
                     key={college.id}
                     onClick={() => handleCollegeClick(college.id)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[#252525] text-gray-300`}
+                    className="flex items-center justify-between px-3 py-2 rounded-[8px] cursor-pointer transition-colors hover:bg-white/5 text-[#6B7280] hover:text-white"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="text-indigo-400">
+                      <div className="text-[#10b981]/70">
                         <svg
                           className="w-5 h-5"
                           fill="none"
@@ -184,7 +233,7 @@ const CommentMain = () => {
           <div className="md:col-span-6 space-y-6">
             <button
               onClick={() => navigate(-1)}
-              className="text-indigo-400 mb-4 flex items-center gap-2 hover:text-indigo-300 transition-colors font-medium"
+              className="text-[#10b981] mb-4 flex items-center gap-2 hover:text-[#10b981]/80 transition-colors font-medium cursor-pointer"
             >
               <svg
                 className="w-5 h-5"
@@ -202,24 +251,43 @@ const CommentMain = () => {
               Back to Feed
             </button>
 
-            <div className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
-              <h1 className="text-xl font-bold text-gray-100 mb-3">
+            <div className="bg-[#12141C] rounded-[12px] p-5 border border-white/5 shadow-none">
+              <h1 className="text-xl font-bold text-white mb-3">
                 {post.title}
               </h1>
               {post.imageUrl && (
                 <img 
                   src={`http://localhost:5000${post.imageUrl}`} 
                   alt="Post content" 
-                  className="w-full max-h-[500px] object-contain rounded-lg mb-4 border border-[#2d2d2d]"
+                  className="w-full max-h-[500px] object-contain rounded-[12px] mb-4 border border-white/5"
                 />
               )}
-              <p className="text-gray-300 leading-relaxed text-[15px]">
+              <p className="text-white leading-relaxed text-[15px] mb-4">
                 {post.content}
               </p>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={(e) => handlePostLike(post.id, e)}
+                      className={`p-1 rounded transition-colors cursor-pointer ${
+                        post.likes && dbUser && post.likes.some(like => like.userId === dbUser.id)
+                          ? "text-[#10b981] hover:text-[#10b981]/80"
+                          : "text-[#6B7280] hover:text-white"
+                      }`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    </button>
+                    <span className="text-[#6B7280] font-medium text-sm">
+                      {post.likes ? post.likes.length : 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-[#1c1c1c] rounded-xl p-5 border border-[#2d2d2d]">
-              <h3 className="text-gray-200 font-semibold mb-5">
+            <div className="bg-[#12141C] rounded-[12px] p-5 border border-white/5 shadow-none">
+              <h3 className="text-white font-semibold mb-5">
                 Comments ({comments.length})
               </h3>
               <div className="flex gap-3 mb-8">
@@ -228,11 +296,11 @@ const CommentMain = () => {
                   value={newCommentText}
                   onChange={(e) => setNewCommentText(e.target.value)}
                   placeholder="Add a comment..."
-                  className="flex-1 bg-[#141414] text-white px-4 py-3 rounded-lg border border-[#2d2d2d] focus:outline-none focus:border-indigo-500"
+                  className="flex-1 bg-[#090A0F] text-white placeholder-[#6B7280] px-4 py-3 rounded-[8px] border border-white/5 focus:outline-none focus:border-[#10b981] transition-colors"
                 />
                 <button
                   onClick={handlePostComment}
-                  className="bg-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                  className="bg-white hover:bg-slate-200 text-black px-6 py-3 rounded-[8px] font-medium transition-colors border-0 shadow-none cursor-pointer"
                 >
                   Post
                 </button>
@@ -240,9 +308,9 @@ const CommentMain = () => {
 
               <div className="space-y-4">
                 {loading ? (
-                  <div className="text-indigo-400 text-sm font-semibold animate-pulse text-center py-4">Loading comments...</div>
+                  <div className="text-[#10b981] text-sm font-semibold animate-pulse text-center py-4">Loading comments...</div>
                 ) : comments.length === 0 ? (
-                  <div className="text-gray-500 text-sm text-center py-4">No comments yet. Be the first to share your thoughts!</div>
+                  <div className="text-[#6B7280] text-sm text-center py-4">No comments yet. Be the first to share your thoughts!</div>
                 ) : (
                   comments.map((comment) => (
                     <CommentSection key={comment.id} comment={comment} />

@@ -6,12 +6,12 @@ const Whiteboard = ({ roomId }) => {
   const [excalidrawAPI, setExcalidraw] = useState(null);
   const isUpdatingFromSocket = useRef(false);
   const debounceTimer = useRef(null);
-///..
-//..
-// this useEffect is for reciveing data from person B
-//..
-//..
-//..
+  ///..
+  //..
+  // this useEffect is for reciveing data from person B
+  //..
+  //..
+  //..
   useEffect(() => {
     if (!excalidrawAPI) return; // Wait until Excalidraw is fully loaded
 
@@ -44,7 +44,7 @@ const Whiteboard = ({ roomId }) => {
   };
 
   return (
-    <div className="flex-1 bg-[#141414] rounded-xl border border-neutral-800 shadow-sm relative overflow-hidden flex flex-col">
+    <div className="flex-1 bg-[#090A0F] rounded-[12px] border border-white/5 relative overflow-hidden flex flex-col shadow-none">
       <Excalidraw
         theme="dark"
         excalidrawAPI={(api) => setExcalidraw(api)}

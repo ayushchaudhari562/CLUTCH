@@ -84,53 +84,51 @@ const Feedpost = ({ onClose }) => {
                   event from traveling up to the parent elements." 
                   This ensures clicking inside the modal doesn't 
                   accidentally close it. */}
-            <div onClick={(e) => e.stopPropagation()} className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1c1c1c] z-50 p-6 rounded-xl border border-[#2d2d2d] w-[90%]  h-[90%] shadow-2xl">
-                <div className="flex justify-between items-center border-b border-gray-800 pb-3 mb-4">
+            <div onClick={(e) => e.stopPropagation()} className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#12141C] z-50 p-6 rounded-[12px] border border-white/10 w-[90%] h-[90%] shadow-none text-white flex flex-col font-sans">
+                <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-4 shrink-0">
                     <h3 className="text-lg font-semibold text-white">Create a Campus Post</h3>
                     
                     {/* Clean 'X' button to manually close the pop-up composition box */}
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-800 w-8 h-8 rounded-full flex items-center justify-center transition text-sm font-bold"
+                        className="text-[#6B7280] hover:text-white bg-[#090A0F] hover:bg-white/5 border border-white/5 w-8 h-8 rounded-[50%] flex items-center justify-center transition-colors text-sm font-bold cursor-pointer shadow-none"
                     >
                         ✕
                     </button>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 flex-1 overflow-y-auto pr-1">
                     <input 
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Post title"
-                        className="w-full bg-[#141414] text-gray-200 border border-[#2d2d2d] rounded-lg p-3 focus:outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-[#090A0F] text-white placeholder-[#6B7280] border border-white/5 rounded-[8px] p-3 focus:outline-none focus:border-[#10b981] transition-colors"
                     />
 
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full bg-[#141414] text-gray-200 border border-[#2d2d2d] rounded-lg p-3 min-h-[300px] focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                        className="w-full bg-[#090A0F] text-white placeholder-[#6B7280] border border-white/5 rounded-[8px] p-3 min-h-[300px] focus:outline-none focus:border-[#10b981] transition-colors resize-none"
                         placeholder="What's on your mind?"
                     ></textarea>
 
-                    <div>
-                        <label className="text-sm text-gray-400 block mb-1">Attach an Image</label>
+                    <div className="pt-2">
+                        <label className="text-sm text-[#6B7280] block mb-1">Attach an Image</label>
                         <input 
-                        
                             type="file" 
                             accept="image/*"
                             onChange={(e) => setImage(e.target.files[0])}
-                            
-                            className="text-gray-200 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-900/50 file:text-purple-300 hover:file:bg-purple-900/80 cursor-pointer"
+                            className="text-[#6B7280] text-sm file:mr-4 file:py-2 file:px-4 file:rounded-[20px] file:border file:border-emerald-500/20 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-[#10b981] hover:file:bg-emerald-500/20 cursor-pointer"
                         />
                     </div>
                 </div>
 
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mt-4 pt-4 border-t border-white/5 shrink-0">
                     <button 
                         onClick={handleSubmit} 
                         disabled={loading}
-                        className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg font-medium transition-colors"
+                        className="bg-white hover:bg-slate-200 disabled:opacity-50 text-black px-6 py-2.5 rounded-[8px] font-medium transition-colors border-0 shadow-none cursor-pointer"
                     >
                         {loading ? 'Posting...' : 'Post'}
                     </button>
