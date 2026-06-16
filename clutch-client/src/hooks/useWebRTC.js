@@ -58,6 +58,7 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   useEffect(() => {
+    let activeStream = null;
     const getMedia = async () => {
       try {
         //..
@@ -73,6 +74,7 @@ export const useWebRTC = (roomId) => {
         // Is stream ko state mein save kar rahe hain taaki baad mein muting/unmuting mein use kar sakein
         //..
         //..
+        activeStream = stream;
         setLocalStream(stream);
         
         //..
@@ -93,6 +95,12 @@ export const useWebRTC = (roomId) => {
       }
     };
     getMedia();
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+    };
   }, []);
 
   const toggleVideo = () => {
@@ -308,6 +316,11 @@ export const useWebRTC = (roomId) => {
       socket.off("webrtc-answer");
       socket.off("webrtc-ice-candidate");
       socket.off("call-rejected");
+
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+        peerConnectionRef.current = null;
+      }
     };
   }, [roomId, localStream, navigate]);
 
