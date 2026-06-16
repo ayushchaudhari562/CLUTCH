@@ -15,8 +15,8 @@ import StudyRoom from './pages/StudyRoom';
 import Profile from './pages/Profile';
 import MatchPopup from './components/MatchPopup';
 import Campusd from './pages/Campus-Feed';
-import Signin from './pages/Signin';
-import Signup from './pages/Signup';
+import Signin from './pages/SignIn';
+import Signup from './pages/SignUp';
 import CollegeSelector from './api/College';
 import CommentMain from './api/CommentsMain';
 
