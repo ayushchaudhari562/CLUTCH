@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: clutch-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma db push
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clutch-db
+          property: connectionString
+      - key: CLIENT_URL
+        sync: false
+        placeholder: "The URL of your deployed frontend (e.g., https://clutch.vercel.app)"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+        placeholder: "Your Cloudinary cloud name"
+      - key: CLOUDINARY_API_KEY
+        sync: false
+        placeholder: "Your Cloudinary API key"
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+        placeholder: "Your Cloudinary API secret"
+
+databases:
+  - name: clutch-db

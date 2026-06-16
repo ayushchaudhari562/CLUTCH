@@ -1,5 +1,10 @@
 {
   "name": "clutch-root",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix clutch-client",
+    "dev:client": "npm run dev --prefix clutch-client",
+    "dev:server": "npm run dev --prefix backend"
+  }
 }
