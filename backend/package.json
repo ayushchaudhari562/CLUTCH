@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "postinstall": "prisma generate",
     "autocommit": "nodemon --watch ../ --ext js,jsx,ts,json,prisma,html,css --exec \"git add .. && git commit -m 'Auto-commit' || exit 0\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
