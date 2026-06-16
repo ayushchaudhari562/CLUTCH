@@ -1,7 +1,10 @@
 const express = require('express');
-const { addComment, getPostComments, editComment } = require('../controllers/CommentlogicAPI');
+const { addComment, getPostComments, editComment, getCommentsByUser } = require('../controllers/CommentlogicAPI');
 const { toggleCommentLike } = require('../controllers/LikeController');
 const router = express.Router();
+
+// Fetch comments authored by a specific DB user id
+router.get('/user/:userId', getCommentsByUser);
 
 router.post('/', addComment);
 router.get('/:postId', getPostComments);

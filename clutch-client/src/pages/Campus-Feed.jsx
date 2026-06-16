@@ -127,7 +127,7 @@ const CampusFeed = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* LEFT COLUMN */}
         <div className="md:col-span-3 space-y-6">
           {/* COLLEGE */}
@@ -211,20 +211,34 @@ const CampusFeed = () => {
           <div className="space-y-6">
             {posts.map((post) => (
               <div key={post.id} onClick={() => { navigate(`/post/${post.id}`, { state: { post } }); handlePostClick(post); }} className="bg-[#12141C] rounded-[12px] p-5 border border-white/5 cursor-pointer hover:border-[#10B981]/30 transition-colors shadow-none">
-                <div className="flex gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-[50%] bg-emerald-500/10 flex items-center justify-center text-[#10B981] font-medium shrink-0">
-                    U1
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-white">{post.title}</h4>
-                      <span className="px-2.5 py-0.5 rounded-[20px] text-[11px] font-medium bg-emerald-500/10 text-[#10B981] border border-[#10B981]/20">Post</span>
+                {(() => {
+                  const getAnonymousName = (user) => {
+                    const animals = ["Anon", "Beluga", "Owl", "Tiger", "Panda", "Fox", "Hawk", "Wolf", "Bear", "Koala", "Rabbit"];
+                    const id = user?.id || 0;
+                    const animal = animals[id % animals.length];
+                    return `${animal}${id}`;
+                  };
+                  const anonName = getAnonymousName(post.author);
+                  return (
+                    <div className="flex gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-[50%] bg-emerald-500/10 flex items-center justify-center text-[#10B981] font-medium shrink-0 uppercase">
+                        {anonName.substring(0, 2)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-white">{anonName}</h4>
+                          <span className="px-2.5 py-0.5 rounded-[20px] text-[11px] font-medium bg-emerald-500/10 text-[#10B981] border border-[#10B981]/20">Post</span>
+                        </div>
+                        <div className="text-white text-sm font-semibold mt-1">
+                          {post.title}
+                        </div>
+                        <div className="text-[#6B7280] text-xs mt-0.5">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[#6B7280] text-xs mt-0.5">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* Image Rendering */}
                 {post.imageUrl && (

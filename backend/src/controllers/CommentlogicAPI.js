@@ -99,6 +99,30 @@ const getPostComments = async (req, res) => {
   }
 };
 
+const getCommentsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const comments = await prisma.comment.findMany({
+      where: { userId: parseInt(userId) },
+      include: { CommentLikes: true, post: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const mapped = comments.map(c => ({
+      id: c.id,
+      postId: c.postId,
+      content: c.content,
+      likesCount: c.CommentLikes ? c.CommentLikes.length : 0,
+      createdAt: c.createdAt,
+    }));
+
+    res.status(200).json(mapped);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch user comments" });
+  }
+};
+
 const editComment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -126,4 +150,5 @@ module.exports = {
   addComment,
   getPostComments,
   editComment,
+  getCommentsByUser,
 };

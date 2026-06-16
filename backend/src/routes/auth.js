@@ -4,7 +4,7 @@ const prisma = require('../prisma.js');
 
 router.post("/save-college", async (req, res) => {
     try {
-        const { clerkId, collegeName,collegeId } = req.body;
+        const { clerkId, collegeName, collegeId, username } = req.body;
 
         if (!clerkId || !collegeName) {
             return res.status(400).json({ error: "Missing clerkId or collegeName" });
@@ -16,14 +16,15 @@ router.post("/save-college", async (req, res) => {
             where: { clerkId: clerkId },
             update: {
                 collegeName: collegeName,
-                collegeId: collegeId
+                collegeId: collegeId,
+                ...(username && { username })
             },
             create: {
                 clerkId: clerkId,
                 collegeName: collegeName,
                 collegeId: collegeId,
                 // These are required fields in your Prisma schema that Clerk normally handles
-                username: clerkId,
+                username: username || clerkId,
                 email: clerkId + "@placeholder.com",
                 passwordHash: "managed-by-clerk"
             }
@@ -52,5 +53,21 @@ router.get("/user/:clerkId",async (req,res)=>{
         res.status(500).json({ error: "Internal server error" });
     };
 })
+
+router.post("/sync-user", async (req, res) => {
+    try {
+        const { clerkId, username } = req.body;
+        if (!clerkId || !username) return res.status(400).json({ error: "Missing data" });
+
+        const user = await prisma.user.update({
+            where: { clerkId: clerkId },
+            data: { username: username }
+        });
+        res.status(200).json(user);
+    } catch (error) {
+        // User might not exist yet, ignore
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 module.exports = router;

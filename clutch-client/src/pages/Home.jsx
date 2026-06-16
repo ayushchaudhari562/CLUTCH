@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import socket from "../socket/socket";
+import { motion } from "framer-motion";
+import { Flame, Clock, GraduationCap, ShieldAlert, PlusCircle } from "lucide-react";
 
 const Home = ({ swaps = [] }) => {
   const { user } = useUser();
@@ -56,7 +58,7 @@ const Home = ({ swaps = [] }) => {
     socket.emit("request-match", {
       targetSocketId: swap.socketId,
       requesterSocketId: socket.id,
-      requesterName: user ? user.fullName || "Clutch User" : "Users--requesting"
+      requesterName: user ? user.username || user.fullName || "Clutch User" : "Users--requesting"
     });
     alert("Match request sent!");
   };
@@ -77,203 +79,266 @@ const Home = ({ swaps = [] }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans space-y-6">
-        <div className="flex items-center border-b border-white/5 pb-4">
+      <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans space-y-8 pt-24 pb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center border-b border-white/5 pb-6"
+        >
           <section className="text-lg font-semibold text-white">
-            <h1 className="text-2xl font-bold">{getGreeting()}</h1>
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-[#6B7280]">
+              {getGreeting()}, {user?.firstName || "Student"}!
+            </h1>
 
-            <p className="text-sm text-[#6B7280] mt-1">
+            <p className="text-sm text-[#6B7280] mt-2 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#10b981]" />
               {currentTime.toLocaleDateString("en-IN", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
                 year: "numeric",
               })}
-            </p>
-
-            <p className="text-sm text-[#6B7280] mt-0.5">
+              {" • "}
               {currentTime.toLocaleTimeString()}
             </p>
           </section>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="bg-[#12141C] border border-white/5 rounded-[8px] px-4 py-2 text-[#6B7280] text-sm">
-            Session Streak: <span className="text-white font-medium">{session}</span>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="flex flex-wrap gap-4 items-center"
+        >
+          <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3 shadow-lg">
+            <Flame className="text-orange-500 w-5 h-5" />
+            <div className="flex flex-col">
+              <span className="text-[#6B7280] text-[11px] uppercase tracking-wider font-semibold">Session Streak</span>
+              <span className="text-white font-bold text-sm">{session}</span>
+            </div>
           </div>
-          <div className="bg-[#12141C] border border-white/5 rounded-[8px] px-4 py-2 text-[#6B7280] text-sm">
-            Day Streak: <span className="text-white font-medium">{session}</span>
+          
+          <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3 shadow-lg">
+            <Flame className="text-red-500 w-5 h-5" />
+            <div className="flex flex-col">
+              <span className="text-[#6B7280] text-[11px] uppercase tracking-wider font-semibold">Day Streak</span>
+              <span className="text-white font-bold text-sm">{session}</span>
+            </div>
           </div>
-          <div className="bg-[#12141C] border border-white/5 rounded-[8px] px-4 py-2 text-[#6B7280] text-sm">
-            College: <span className="font-semibold text-[#10b981]">{userCollege}</span>
+
+          <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3 shadow-lg">
+            <GraduationCap className="text-[#10b981] w-5 h-5" />
+            <div className="flex flex-col">
+              <span className="text-[#6B7280] text-[11px] uppercase tracking-wider font-semibold">College</span>
+              <span className="text-white font-bold text-sm truncate max-w-[800px]">{userCollege}</span>
+            </div>
           </div>
-          <button className="cursor-pointer bg-[#10b981] hover:bg-[#059669] text-black text-xs px-6 py-2 rounded-[8px] font-semibold border-0 shadow-none transition-colors">
-            SOS
-          </button>
-          <button
-            onClick={() => navigate("/study-swap")}
-            className="bg-transparent hover:bg-white/5 text-[#ccc] border border-[#3a3d3a] px-[22px] py-[10px] rounded-[8px] text-[13px] font-medium transition-colors shadow-none cursor-pointer"
+
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 cursor-pointer bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-6 py-3 rounded-[12px] font-bold shadow-none transition-colors ml-auto"
           >
-            Post a swap request
-          </button>
-        </div>
+            <ShieldAlert className="w-5 h-5" />
+            SOS
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/study-swap")}
+            className="flex items-center gap-2 bg-[#10b981] hover:bg-[#059669] text-black border-0 px-6 py-3 rounded-[12px] font-bold shadow-lg shadow-[#10b981]/20 cursor-pointer transition-all"
+          >
+            <PlusCircle className="w-5 h-5" />
+            Post Swap
+          </motion.button>
+        </motion.div>
 
-        <div>
-          <h2 className="text-[#6B7280] text-[11px] font-semibold tracking-wider mb-4 uppercase">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <h2 className="text-[#6B7280] text-xs font-bold tracking-[2px] mb-6 uppercase flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
             Recent Swap Requests
           </h2>
+          
           {swaps.length === 0 ? (
-            <p className="text-[#6B7280] italic bg-[#12141C] p-6 rounded-[12px] border border-white/5 text-center shadow-none">
-              No swap requests posted yet.
-            </p>
+            <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[16px] border border-white/10 text-center shadow-lg">
+              <PlusCircle className="w-12 h-12 text-[#6B7280] mx-auto mb-4 opacity-50" />
+              <p className="text-[#6B7280] font-medium">No swap requests posted yet.</p>
+              <p className="text-sm text-[#6B7280] mt-1">Be the first to post a study swap!</p>
+            </div>
           ) : (
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column: Skill Swaps */}
-              <div className="bg-[#12141C] p-6 rounded-[12px] border border-white/5 shadow-none flex flex-col">
-                <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-3">
-                  <h2 className="text-[11px] font-semibold text-[#6B7280] tracking-wider uppercase">Skill Swaps</h2>
-                  <span className="bg-emerald-500/10 text-[#10b981] text-[11px] px-3 py-0.5 rounded-[20px] font-medium border border-emerald-500/20">
+              <div className="bg-[#0E1115]/80 backdrop-blur-md p-6 lg:p-8 rounded-[20px] border border-white/5 shadow-xl flex flex-col">
+                <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
+                  <h2 className="text-[13px] font-bold text-white tracking-widest uppercase">Skill Swaps</h2>
+                  <span className="bg-emerald-500/10 text-[#10b981] text-[11px] px-3 py-1 rounded-full font-bold border border-emerald-500/20">
                     {swaps.filter((s) => s.category === "skill").length} Active
                   </span>
                 </div>
 
-                {swaps.filter((s) => s.category === "skill").length === 0 ? (
-                  <p className="text-[#6B7280] italic bg-[#090A0F] p-6 rounded-[12px] border border-white/5 text-center shadow-none my-auto">
+                  {swaps.filter((s) => s.category === "skill").length === 0 ? (
+                  <p className="text-[#6B7280] italic bg-[#0E1115] p-6 rounded-[12px] border border-white/5 text-center my-auto">
                     No skill swaps posted yet.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {swaps
                       .filter((s) => s.category === "skill")
-                      .map((swap) => (
-                        <div
+                      .map((swap, index) => (
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * index }}
+                          whileHover={{ scale: 1.02 }}
                           key={swap.id}
-                          className="p-7 bg-[#090A0F] rounded-[16px] border border-white/5 hover:border-emerald-500/30 hover:scale-[1.01] transition-all duration-200 flex flex-col justify-between shadow-xl"
+                          className="p-6 bg-[#0E1115] rounded-[16px] border border-white/5 hover:border-emerald-500/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
                         >
-                          <div>
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all"></div>
+                          
+                          <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-bold text-lg text-white tracking-tight">
+                                <h3 className="font-bold text-xl text-white tracking-tight">
                                   {swap.name}
                                 </h3>
-                                <p className="text-sm text-[#6B7280] mt-1">
+                                <p className="text-sm text-[#6B7280] mt-1 font-medium">
                                   {swap.college} • {swap.year} Year
                                 </p>
                               </div>
-                              <span className="px-3.5 py-1 text-xs font-semibold bg-white/5 text-[#6B7280] rounded-full border border-white/5">
+                              <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white rounded-full border border-white/10 shadow-sm">
                                 {swap.urgency}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-semibold mb-4 mt-2">
+                            
+                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
                               <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
                             </div>
-                            <div className="space-y-4 text-sm border-t border-white/5 pt-4 mt-3">
+                            
+                            <div className="space-y-4 text-sm border-t border-white/10 pt-5">
                               <div>
-                                <span className="font-bold text-[#10b981] uppercase text-[11px] tracking-widest block">
+                                <span className="font-bold text-[#10b981] uppercase text-[10px] tracking-widest block mb-1.5">
                                   Offering
                                 </span>
-                                <span className="text-white mt-1 text-base font-medium block">
+                                <span className="text-white text-base font-medium block">
                                   {swap.offer}
                                 </span>
                               </div>
                               <div className="flex justify-between items-end pt-2">
                                 <div>
-                                  <span className="font-bold text-[#f87171] uppercase text-[11px] tracking-widest block">
+                                  <span className="font-bold text-[#f87171] uppercase text-[10px] tracking-widest block mb-1.5">
                                     Seeking
                                   </span>
-                                  <span className="text-white mt-1 text-base font-medium block">
+                                  <span className="text-white text-base font-medium block">
                                     {swap.need}
                                   </span>
                                 </div>
-                                <button
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
                                   onClick={(e) => { e.stopPropagation(); handleMatch(swap); }}
-                                  className="cursor-pointer bg-[#10b981] hover:bg-[#059669] text-black text-sm px-6 py-3 rounded-[10px] font-extrabold border-0 shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] uppercase tracking-wider shrink-0"
+                                  className="cursor-pointer bg-white text-black hover:bg-slate-200 text-sm px-6 py-2.5 rounded-[10px] font-bold border-0 shadow-lg transition-all tracking-wide"
                                 >
                                   Match
-                                </button>
+                                </motion.button>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                   </div>
                 )}
               </div>
 
               {/* Right Column: DSA Swaps */}
-              <div className="bg-[#12141C] p-6 rounded-[12px] border border-white/5 shadow-none flex flex-col">
-                <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-3">
-                  <h2 className="text-[11px] font-semibold text-[#6B7280] tracking-wider uppercase">DSA Swaps</h2>
-                  <span className="bg-emerald-500/10 text-[#10b981] text-[11px] px-3 py-0.5 rounded-[20px] font-medium border border-emerald-500/20">
+              <div className="bg-[#0E1115]/80 backdrop-blur-md p-6 lg:p-8 rounded-[20px] border border-white/5 shadow-xl flex flex-col">
+                <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
+                  <h2 className="text-[13px] font-bold text-white tracking-widest uppercase">DSA Swaps</h2>
+                  <span className="bg-emerald-500/10 text-[#10b981] text-[11px] px-3 py-1 rounded-full font-bold border border-emerald-500/20">
                     {swaps.filter((s) => s.category === "dsa").length} Active
                   </span>
                 </div>
 
                 {swaps.filter((s) => s.category === "dsa").length === 0 ? (
-                  <p className="text-[#6B7280] italic bg-[#090A0F] p-6 rounded-[12px] border border-white/5 text-center shadow-none my-auto">
+                  <p className="text-[#6B7280] italic bg-[#0E1115] p-6 rounded-[12px] border border-white/5 text-center my-auto">
                     No DSA swaps posted yet.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {swaps
                       .filter((s) => s.category === "dsa")
-                      .map((swap) => (
-                        <div
+                      .map((swap, index) => (
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * index }}
+                          whileHover={{ scale: 1.02 }}
                           key={swap.id}
-                          className="p-7 bg-[#090A0F] rounded-[16px] border border-white/5 hover:border-emerald-500/30 hover:scale-[1.01] transition-all duration-200 flex flex-col justify-between shadow-xl"
+                          className="p-6 bg-[#0E1115] rounded-[16px] border border-white/5 hover:border-[#3b82f6]/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
                         >
-                          <div>
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-[#3b82f6]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#3b82f6]/10 transition-all"></div>
+                          
+                          <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-bold text-lg text-white tracking-tight">
+                                <h3 className="font-bold text-xl text-white tracking-tight">
                                   {swap.name}
                                 </h3>
-                                <p className="text-sm text-[#6B7280] mt-1">
+                                <p className="text-sm text-[#6B7280] mt-1 font-medium">
                                   {swap.college} • {swap.year} Year
                                 </p>
                               </div>
-                              <span className="px-3.5 py-1 text-xs font-semibold bg-white/5 text-[#6B7280] rounded-full border border-white/5">
+                              <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white rounded-full border border-white/10 shadow-sm">
                                 {swap.urgency}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-semibold mb-4 mt-2">
+                            
+                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
                               <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
                             </div>
-                            <div className="space-y-4 text-sm border-t border-white/5 pt-4 mt-3">
+                            
+                            <div className="space-y-4 text-sm border-t border-white/10 pt-5">
                               <div>
-                                <span className="font-bold text-[#10b981] uppercase text-[11px] tracking-widest block">
+                                <span className="font-bold text-[#3b82f6] uppercase text-[10px] tracking-widest block mb-1.5">
                                   Offering
                                 </span>
-                                <span className="text-white mt-1 text-base font-medium block">
+                                <span className="text-white text-base font-medium block">
                                   {swap.offer}
                                 </span>
                               </div>
                               <div className="flex justify-between items-end pt-2">
                                 <div>
-                                  <span className="font-bold text-[#f87171] uppercase text-[11px] tracking-widest block">
+                                  <span className="font-bold text-[#f87171] uppercase text-[10px] tracking-widest block mb-1.5">
                                     Seeking
                                   </span>
-                                  <span className="text-white mt-1 text-base font-medium block">
+                                  <span className="text-white text-base font-medium block">
                                     {swap.need}
                                   </span>
                                 </div>
-                                <button
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
                                   onClick={(e) => { e.stopPropagation(); handleMatch(swap); }}
-                                  className="cursor-pointer bg-[#10b981] hover:bg-[#059669] text-black text-sm px-6 py-3 rounded-[10px] font-extrabold border-0 shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] uppercase tracking-wider shrink-0"
+                                  className="cursor-pointer bg-white text-black hover:bg-slate-200 text-sm px-6 py-2.5 rounded-[10px] font-bold border-0 shadow-lg transition-all tracking-wide"
                                 >
                                   Match
-                                </button>
+                                </motion.button>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                   </div>
                 )}
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
 
         <footer className="max-w-[900px] mx-auto pt-4">
 
@@ -281,8 +346,8 @@ const Home = ({ swaps = [] }) => {
 
         {/* The Match Request Popup */}
         {incomingRequest && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#222622] p-6 rounded-[12px] border border-[#2e332e] max-w-sm w-full text-white shadow-none">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0E1115] p-6 rounded-[12px] border border-[#2e332e] max-w-sm w-full text-white shadow-none">
               <h3 className="text-lg font-bold text-white mb-2">New Match Request</h3>
 
               <p className="mb-6 text-[#6B7280]">

@@ -156,10 +156,26 @@ const CommentMain = () => {
     navigate("/");
   };
 
+  const handleDeletePost = async () => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/feed/post/${postId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        navigate("/");
+      } else {
+        alert("Failed to delete post.");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans pt-24">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
           
           <div className="hidden md:block md:col-span-3 space-y-6">
             <div className="bg-[#12141C] rounded-[12px] p-4 border border-white/5 shadow-none">
@@ -252,9 +268,19 @@ const CommentMain = () => {
             </button>
 
             <div className="bg-[#12141C] rounded-[12px] p-5 border border-white/5 shadow-none">
-              <h1 className="text-xl font-bold text-white mb-3">
-                {post.title}
-              </h1>
+              <div className="flex justify-between items-start mb-3">
+                <h1 className="text-xl font-bold text-white">
+                  {post.title}
+                </h1>
+                {dbUser && post.authorId === dbUser.id && (
+                  <button
+                    onClick={handleDeletePost}
+                    className="cursor-pointer bg-transparent border border-red-500/50 hover:bg-red-500/10 text-red-500 text-sm px-3 py-1.5 rounded-[8px] font-medium transition-colors"
+                  >
+                    Delete Post
+                  </button>
+                )}
+              </div>
               {post.imageUrl && (
                 <img 
                   src={`http://localhost:5000${post.imageUrl}`} 

@@ -10,10 +10,12 @@ const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
 const collegeRoutes = require('./routes/college');
 const commentRoutes = require('./routes/comments');
+const swapRoutes = require('./routes/swapRoutes');
 
 app.use('/api/feed', feedRoutes);
 app.use('/api', authRoutes);
 app.use('/api/colleges', collegeRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/swaps', swapRoutes);
 
 module.exports = app;

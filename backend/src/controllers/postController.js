@@ -94,4 +94,17 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getAllPosts };
+const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    await prisma.post.delete({
+      where: { id: parseInt(postId) }
+    });
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ error: "Failed to delete post" });
+  }
+};
+
+module.exports = { createPost, getAllPosts, deletePost };

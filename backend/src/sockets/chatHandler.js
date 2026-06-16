@@ -2,6 +2,11 @@ module.exports = (io) => {
   io.on("connection", (socket) => {
     console.log("User connected", socket.id);
 
+    socket.on("register", (userId) => {
+      socket.join(userId);
+      console.log(`User registered: ${userId}`);
+    });
+
     socket.on("join-room", (roomId) => {
       socket.join(roomId);
       io.to(roomId).emit("receive-message", "A new user joined");
@@ -15,10 +20,8 @@ module.exports = (io) => {
     //.....
     //if someone is click on match than this will take us call this 
     socket.on("request-match", (data) => {
-      //yha fas skta hu:: baad me ,it is calling
-      //  the person have made the post 
-      // also we can say 
-      io.to(data.targetSocketId).emit("incoming-match-request", data);
+      // Emit to the target user's ID room (which they joined on register)
+      io.to(data.targetUserId).emit("incoming-match-request", data);
     });
     //now for person who had posted will decide to 
     // accept or reject it
@@ -32,12 +35,11 @@ module.exports = (io) => {
 
       io.to(data.requesterSocketId).emit("match-accepted", roomId);
       io.to(data.targetSocketId).emit("match-accepted", roomId);
-      //also emit the match found event so that server show the 
-      // call interface on the frontend
-      //...
-      //...
-      //..
-    })
+    });
+
+    socket.on("decline-match", (data) => {
+      io.to(data.requesterSocketId).emit("match-declined");
+    });
 
     //for handling the webrtc offering and answering calls
     //call feautre

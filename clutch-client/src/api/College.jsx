@@ -45,7 +45,7 @@ const CollegeSelector = () => {
                 console.error("Error fetching colleges from backend:", err);
                 setIsLoading(false);
             });
-    }, [search]); // <--- Ye array React ko batata hai ki sirf tab run karo jab 'search' change ho
+    }, [search]);
 
     const handleSelectCollege = async (collegeName) => {
         if (!user) return; // Agar user logged in nahi hai, to aage mat badho
@@ -59,10 +59,11 @@ const CollegeSelector = () => {
             body: JSON.stringify({ 
                 clerkId: user.id, // User ki unique ID bhej rahe hain
                 collegeName: collegeName, // Selected college ka naam bhej rahe hain
-                collegeId: allColleges.find(c => c.name === collegeName)?.id // collegeId bhi bhej rahe hain! this is very imp
-                
+                collegeId: allColleges.find(c => c.name === collegeName)?.id, //collegeId bhi bhej rahe hain! this is very imp
+                username: user.fullName || user.username || user.firstName || "Clutch User"
             })
         });
+
 
         // ...
         // Step 4: Jab college save ho jaye, to user ko Campus Feed wale page par bhej do!
