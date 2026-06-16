@@ -108,8 +108,8 @@ const CampusFeed = () => {
     const fetchPosts = async () => {
       try {
         const url = selectedCollegeId
-          ? `/api/feed/all?collegeId=${selectedCollegeId}`
-          : `/api/feed/all`;
+          ? `${import.meta.env.VITE_API_URL}/api/feed/all?collegeId=${selectedCollegeId}`
+          : `${import.meta.env.VITE_API_URL}/api/feed/all`;
 
         fetch(url)// i will add comment later here ig i need more change here y
           .then(res => res.json())
@@ -229,7 +229,7 @@ const CampusFeed = () => {
                           <h4 className="font-semibold text-white">{anonName}</h4>
                           <span className="px-2.5 py-0.5 rounded-[20px] text-[11px] font-medium bg-emerald-500/10 text-[#10B981] border border-[#10B981]/20">Post</span>
                         </div>
-                        <div className="text-white text-sm font-semibold mt-1">
+                        <div className="text-white text-2xl font-bold mt-2 mb-1">
                           {post.title}
                         </div>
                         <div className="text-[#6B7280] text-xs mt-0.5">

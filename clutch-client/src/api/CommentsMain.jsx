@@ -269,7 +269,7 @@ const CommentMain = () => {
 
             <div className="bg-[#12141C] rounded-[12px] p-5 border border-white/5 shadow-none">
               <div className="flex justify-between items-start mb-3">
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-white text-2xl font-bold mt-2 mb-1">
                   {post.title}
                 </h1>
                 {dbUser && post.authorId === dbUser.id && (

@@ -17,10 +17,9 @@ The platform consists of a React client Single Page Application (SPA), an event-
   * Real-time media streams bypass the application server entirely once established, running peer-to-peer over UDP sockets negotiated dynamically.
 
 ### 1.2 Server & Runtime Environment
-* **Express.js API Engine:** Powered by Node.js, running an event loop to handle API routes, static file routing for user uploads via disk systems, and JSON payloads.
-* **Socket.io WebSocket Layer:** Runs in-process with the HTTP server on port `5000`. It acts as a signaling channel, room coordinator, and real-time state router.
-* **CORS Restrictions:** Express middleware limits connections to trusted origins:
-  * Origin: `http://localhost:5173`
+* **Express.js API Engine:** Powered by Node.js, running an event loop to handle API routes, JSON payloads, and dynamic image uploading directly to Cloudinary.
+* **Socket.io WebSocket Layer:** Runs in-process with the HTTP server. It acts as a signaling channel, room coordinator, and real-time state router.
+* **CORS Restrictions:** Express middleware limits connections to trusted frontend origins (configured via environment variables or localhost defaults).
   * Allowed Headers: Standard headers, including authorization tokens and session IDs.
   * Credentials: Enabled to support cookies and token handshakes.
 
@@ -67,7 +66,7 @@ flowchart TD
     
     RenderFeed --> NewPost[User creates a post]
     NewPost --> FileInput{Has image attachment?}
-    FileInput -- Yes --> FormPayload[Append text & binary to FormData] --> MulterDir[Post /api/feed/create via Multer filesystem write] --> DBPost[Insert Post record with imageUrl pointer]
+    FileInput -- Yes --> FormPayload[Append text & binary to FormData] --> MulterDir[Post /api/feed/create via Cloudinary SDK] --> DBPost[Insert Post record with permanent Cloudinary imageUrl pointer]
     FileInput -- No --> PostPayload[POST content payload] --> DBPost
     
     RenderFeed --> ViewComments[User expands comments section /post/:postId]
@@ -258,7 +257,7 @@ sequenceDiagram
 | :--- | :--- | :--- |
 | **Frontend** | React 19, Vite, TailwindCSS (v4), React Router Dom (v7), `@clerk/clerk-react` | Client-side interface rendering, application routing, and authentication wrappers. |
 | **Real-time Engine**| Socket.io-client, RTCPeerConnection (WebRTC), `@excalidraw/excalidraw` | Event-driven socket connections, media negotiation, and canvas serialization. |
-| **Backend API** | Node.js, Express 5, Socket.io, Multer, `xlsx` | HTTP interface routing, media binary uploads, and Excel parsing. |
+| **Backend API** | Node.js, Express 5, Socket.io, Multer, `cloudinary`, `xlsx` | HTTP interface routing, media binary remote uploads, and Excel parsing. |
 | **Database Engine** | PostgreSQL, Prisma Client | Relational data persistence, schema modeling, and raw analytical querying. |
 
 ---
@@ -292,7 +291,7 @@ The backend codebase manages HTTP routing, WebSocket event handlers, relational 
         *   `comments.js`: Standardizes routes (`POST /`, `GET /:postId`, `PUT /:id`) mapping comments to controller methods.
         *   `feed.js`: Endpoints (`POST /create`, `GET /all`) controlling post workflows and binding multer file interceptors.
     *   **`services/`**
-        *   `multer.js`: Service configured to map multipart form submissions. Creates directory `/uploads/` on bootstrap, generates safe randomized file outputs via filesystem utilities, and implements strict size filters.
+        *   `multer.js`: Service configured to map multipart form submissions using the `multer-storage-cloudinary` wrapper. Automatically forwards image binary streams to the `clutch_posts` directory in the Cloudinary Media Library and enforces strict 5MB size limits.
     *   **`sockets/`**
         *   `chatHandler.js`: Socket callback mapper. Coordinates workspace connections, parses instant message buffers, registers signaling handlers (`webrtc-offer`, `webrtc-answer`, `webrtc-ice-candidate`), and handles call rejection states.
         *   `whiteboardHandler.js`: Intercepts Excalidraw updates, broadcasting serial coordinates directly to client sets bound to the active roomId.
@@ -446,6 +445,9 @@ WebSocket operations implement strict interfaces mapping directly to the backend
 3. Populate database configuration inside `.env`:
    ```env
    DATABASE_URL="postgresql://<db_user>:<db_password>@<db_host>:<db_port>/<db_name>?schema=public"
+   CLOUDINARY_CLOUD_NAME="your_cloud_name"
+   CLOUDINARY_API_KEY="your_api_key"
+   CLOUDINARY_API_SECRET="your_api_secret"
    ```
 4. Run schema migration scripts to configure PostgreSQL tables:
    ```bash
@@ -468,6 +470,7 @@ WebSocket operations implement strict interfaces mapping directly to the backend
 3. Configure the local environment file `.env`:
    ```env
    VITE_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
+   VITE_API_URL="http://localhost:5000"
    ```
 
 ### 8.3 Development Execution
