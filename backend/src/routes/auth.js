@@ -23,6 +23,7 @@ router.post("/save-college", async (req, res) => {
                 clerkId: clerkId,
                 collegeName: collegeName,
                 collegeId: collegeId,
+                //..aur add krna hai yha ..but have to study
                 // These are required fields in your Prisma schema that Clerk normally handles
                 username: username || clerkId,
                 email: clerkId + "@placeholder.com",
@@ -65,7 +66,7 @@ router.post("/sync-user", async (req, res) => {
         });
         res.status(200).json(user);
     } catch (error) {
-        // User might not exist yet, ignore
+       
         res.status(500).json({ error: "Internal server error" });
     }
 });

@@ -53,9 +53,9 @@ const getAllPosts = async (req, res) => {
           collegeId: filterCollegeId,
         }
     } : {};
-    // Posts nikalna (Filter condition ke hisaab se)
+    
     const posts = await prisma.post.findMany({
-      where: queryCondition, // Yahan hamara dynamic filter lag raha hai
+      where: queryCondition, //...Yahan hamara dynamic filter lag raha hai
       include: { author: true 
         ,likes: true
         

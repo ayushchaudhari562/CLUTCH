@@ -7,7 +7,9 @@ const addComment = async (req, res) => {
     const { clerkId } = req.body;
     let dbUser = await prisma.user.findFirst({ where: { clerkId: clerkId } });
     if (!dbUser && clerkId) {
+      //..
       //Create user if doesn't exist
+      //.....
       dbUser = await prisma.user.create({
         data: {
           clerkId: clerkId,

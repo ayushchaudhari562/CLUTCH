@@ -3,7 +3,7 @@ const { addComment, getPostComments, editComment, getCommentsByUser } = require(
 const { toggleCommentLike } = require('../controllers/LikeController');
 const router = express.Router();
 
-// Fetch comments authored by a specific DB user id
+
 router.get('/user/:userId', getCommentsByUser);
 
 router.post('/', addComment);

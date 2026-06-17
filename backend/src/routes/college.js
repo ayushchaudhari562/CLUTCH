@@ -7,14 +7,16 @@ router.get("/", async (req, res) => {
         const searchQuery = req.query.search || "";
 
         // Query the PostgreSQL database for matching colleges
+        //..
+        //..
         const colleges = await prisma.colleges.findMany({
             where: {
                 name: {
                     contains: searchQuery,
-                    mode: "insensitive" // Makes search case-insensitive
+                    mode: "insensitive"
                 }
             },
-            take: 50 // Limit to 50 results so the frontend doesn't lag
+            take: 50
         });
 
         res.json(colleges);
