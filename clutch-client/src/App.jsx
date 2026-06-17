@@ -23,7 +23,6 @@ import CommentMain from './api/CommentsMain';
 const App = () => {
   const [swaps, setSwaps] = useState([]);
   
-  // Create a navigate wrapper component to use hooks
   return (
     <BrowserRouter>
       <AppContent swaps={swaps} setSwaps={setSwaps} />
@@ -36,13 +35,13 @@ const AppContent = ({ swaps, setSwaps }) => {
 
   useEffect(() => {
     if (user && user.id) {
-      // Sync Clerk fullName to Prisma username automatically
+      
       fetch(import.meta.env.VITE_API_URL + "/api/sync-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           clerkId: user.id,
-          // prefer Clerk `username` (handle) over full name so displays match Clerk handle
+          
           username: user.username || user.fullName || user.firstName || "Clutch User"
         })
       }).catch(err => console.error("Sync user error:", err));
