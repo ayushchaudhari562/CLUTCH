@@ -3,7 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import socket from "../socket/socket";
 import { motion } from "framer-motion";
-import { Search, ArrowRightLeft, Clock, Trash2, CheckCircle2, ChevronDown, Zap } from "lucide-react";
+import {
+  Search,
+  ArrowRightLeft,
+  Clock,
+  Trash2,
+  CheckCircle2,
+  ChevronDown,
+  Zap,
+  BookOpen,
+  Code,
+  Star,
+  PlusCircle,
+  ArrowRight,
+  Sparkles
+} from "lucide-react";
 
 const StudySwap = ({ swaps = [], addSwap }) => {
   const { user } = useUser();
@@ -11,12 +25,10 @@ const StudySwap = ({ swaps = [], addSwap }) => {
   const [need, setNeed] = useState("");
   const [urgency, setUrgency] = useState("");
   const [dsa, setDsa] = useState("");
-  const [incomingRequest, setIncomingRequest] = useState(null);
   const [userCollege, setUserCollege] = useState("IIIT");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Only fetching user data here now, socket logic moved to App.jsx
     if (user) {
       fetch(`${import.meta.env.VITE_API_URL}/api/user/${user.id}`)
         .then(res => res.json())
@@ -28,8 +40,6 @@ const StudySwap = ({ swaps = [], addSwap }) => {
         .catch(err => console.error("Error fetching user data in StudySwap:", err));
     }
   }, [user]);
-
-
 
   const handleMatch = (swap) => {
     socket.emit("request-match", {
@@ -118,285 +128,324 @@ const StudySwap = ({ swaps = [], addSwap }) => {
     }
   };
 
+  // Helper to color urgency badges
+  const getUrgencyStyles = (urgency) => {
+    const cleanUrgency = (urgency || "").toLowerCase();
+    if (cleanUrgency.includes("today")) {
+      return "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20";
+    }
+    if (cleanUrgency.includes("tomorrow")) {
+      return "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20";
+    }
+    return "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20";
+  };
+
   return (
-    <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans pt-24 pb-12">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-10 text-center"
-      >
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-[#6B7280] inline-flex items-center gap-3">
-          <ArrowRightLeft className="text-[#10b981] w-8 h-8" />
-          Study Swap
-        </h1>
-        <p className="text-[#6B7280] mt-2 max-w-xl mx-auto">
-          Trade your skills and knowledge with other students. Post what you can teach and what you need to learn.
-        </p>
-      </motion.div>
+    <div className="min-h-screen bg-[#F8F9FA] text-[#111827] p-4 md:p-6 lg:px-12 font-sans pt-24 pb-12">
+      <div className="max-w-7xl mx-auto space-y-8">
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
-        className="flex flex-wrap md:flex-nowrap gap-4 p-5 max-w-5xl mx-auto items-center bg-white/5 backdrop-blur-md rounded-[16px] border border-white/10 shadow-xl mb-12"
-      >
-        <div className="relative flex-1 min-w-[150px]">
-          <input
-            type="text"
-            placeholder="I can teach..."
-            value={offer}
-            onChange={(e) => setOffer(e.target.value)}
-            className="w-full bg-[#090A0F]/50 text-white placeholder-[#6B7280] border border-white/5 rounded-[10px] pl-4 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent transition-all"
-          />
-        </div>
-
-        <div className="relative flex-1 min-w-[150px]">
-          <input
-            type="text"
-            placeholder="I want to learn..."
-            value={need}
-            onChange={(e) => setNeed(e.target.value)}
-            className="w-full bg-[#090A0F]/50 text-white placeholder-[#6B7280] border border-white/5 rounded-[10px] pl-4 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent transition-all"
-          />
-        </div>
-
-        <div className="relative w-full md:w-48">
-          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
-          <select
-            value={urgency}
-            onChange={(e) => setUrgency(e.target.value)}
-            className="w-full bg-[#090A0F]/50 text-white border border-white/5 rounded-[10px] pl-9 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent cursor-pointer appearance-none"
-          >
-            <option value="" className="bg-[#090A0F] text-[#6B7280]">Urgency</option>
-            <option value="1" className="bg-[#090A0F]">Today</option>
-            <option value="2" className="bg-[#090A0F]">Tomorrow</option>
-            <option value="3" className="bg-[#090A0F]">Next Week</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
-        </div>
-
-        <div className="relative w-full md:w-48">
-          <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
-          <select
-            value={dsa}
-            onChange={(e) => setDsa(e.target.value)}
-            className="w-full bg-[#090A0F]/50 text-white border border-white/5 rounded-[10px] pl-9 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 focus:border-transparent cursor-pointer appearance-none"
-          >
-            <option value="" className="bg-[#090A0F] text-[#6B7280]">Category</option>
-            <option value="1" className="bg-[#090A0F]">Skill Swap</option>
-            <option value="2" className="bg-[#090A0F]">DSA Swap</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handlePost}
-          className="bg-[#10b981] hover:bg-[#059669] text-black font-bold px-8 py-3 rounded-[10px] transition-all shadow-lg shadow-[#10b981]/20 cursor-pointer shrink-0 w-full md:w-auto"
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-center space-y-2"
         >
-          Post
-        </motion.button>
-      </motion.div>
+          <h1 className="text-3xl font-medium text-[#111827] inline-flex items-center justify-center gap-2">
+            <ArrowRightLeft className="text-[#10B981] w-6 h-6" />
+            Study Swap
+          </h1>
+          <p className="text-[#6B7280] text-sm max-w-xl mx-auto">
+            Trade your skills and knowledge with other students. Post what you can teach and what you need to learn.
+          </p>
+        </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8"
-      >
-        {/* Left Column: Skill Swaps */}
-        <div className="bg-[#12141C]/80 backdrop-blur-md p-6 lg:p-8 rounded-[20px] border border-white/5 shadow-xl flex flex-col">
-          <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
-            <h2 className="text-[13px] font-bold text-white tracking-widest uppercase">Skill Swaps</h2>
-            <span className="bg-emerald-500/10 text-[#10b981] text-[11px] px-3 py-1 rounded-full font-bold border border-emerald-500/20">
-              {swaps.filter((s) => s.category === "skill").length} Active
-            </span>
+        {/* Floating Input Control Bar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+          className="p-6 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+        >
+          <div className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-4 flex items-center gap-1.5">
+            <PlusCircle className="w-3.5 h-3.5 text-[#10B981]" /> Create a new swap request
           </div>
 
-          {swaps.filter((s) => s.category === "skill").length === 0 ? (
-            <p className="text-[#6B7280] italic bg-[#090A0F] p-6 rounded-[12px] border border-white/5 text-center my-auto">
-              No skill swaps posted yet. Use the form above to post the first one!
-            </p>
-          ) : (
-            <div className="space-y-5">
-              {swaps
-                .filter((s) => s.category === "skill")
-                .map((swap, index) => (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    whileHover={{ scale: 1.02 }}
-                    key={swap.id}
-                    className="p-6 bg-gradient-to-br from-[#1a1d27] to-[#12141C] rounded-[16px] border border-white/5 hover:border-emerald-500/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all"></div>
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="font-bold text-xl text-white tracking-tight">
-                            {swap.name}
-                          </h3>
-                          <p className="text-sm text-[#6B7280] mt-1 font-medium">
-                            {swap.college} • {swap.year} Year
-                          </p>
-                        </div>
-                        <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white rounded-full border border-white/10 shadow-sm">
-                          {swap.urgency}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
-                        <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
-                      </div>
-
-                      <div className="space-y-4 text-sm border-t border-white/10 pt-5">
-                        <div>
-                          <span className="font-bold text-[#10b981] uppercase text-[10px] tracking-widest block mb-1.5 flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3 h-3" /> Offering
-                          </span>
-                          <span className="text-white text-base font-medium block">
-                            {swap.offer}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between items-end pt-2">
-                          <div>
-                            <span className="font-bold text-[#f87171] uppercase text-[10px] tracking-widest block mb-1.5 flex items-center gap-1.5">
-                              <Search className="w-3 h-3" /> Seeking
-                            </span>
-                            <span className="text-white text-base font-medium block">
-                              {swap.need}
-                            </span>
-                          </div>
-
-                          <div className="flex gap-2">
-                            {(user && (user.id === swap.userId || user.fullName === swap.name || user.username === swap.name)) && (
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => handleDelete(swap.id)}
-                                className="cursor-pointer bg-transparent hover:bg-red-500/10 text-red-500 text-sm p-3 rounded-[10px] transition-all flex items-center justify-center shrink-0 border border-transparent hover:border-red-500/20"
-                                title="Delete Swap"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </motion.button>
-                            )}
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleMatch(swap)}
-                              className="cursor-pointer bg-white text-black hover:bg-slate-200 text-sm px-6 py-2.5 rounded-[10px] font-bold border-0 shadow-lg transition-all tracking-wide"
-                            >
-                              Match
-                            </motion.button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+          <div className="flex flex-wrap lg:flex-nowrap gap-4 items-center">
+            <div className="relative flex-1 min-w-[180px]">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#10B981]">
+                <CheckCircle2 className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="I can teach..."
+                value={offer}
+                onChange={(e) => setOffer(e.target.value)}
+                className="w-full bg-white text-[#111827] placeholder-[#6B7280] border border-[#E5E7EB] rounded-full pl-10 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all text-sm shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+              />
             </div>
-          )}
-        </div>
 
-        {/* Right Column: DSA Swaps */}
-        <div className="bg-[#12141C]/80 backdrop-blur-md p-6 lg:p-8 rounded-[20px] border border-white/5 shadow-xl flex flex-col">
-          <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
-            <h2 className="text-[13px] font-bold text-white tracking-widest uppercase">DSA Swaps</h2>
-            <span className="bg-[#3b82f6]/10 text-[#3b82f6] text-[11px] px-3 py-1 rounded-full font-bold border border-[#3b82f6]/20">
-              {swaps.filter((s) => s.category === "dsa").length} Active
-            </span>
+            <div className="relative flex-1 min-w-[180px]">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#EF4444]">
+                <Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="I want to learn..."
+                value={need}
+                onChange={(e) => setNeed(e.target.value)}
+                className="w-full bg-white text-[#111827] placeholder-[#6B7280] border border-[#E5E7EB] rounded-full pl-10 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all text-sm shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+              />
+            </div>
+
+            <div className="relative w-full md:w-48 shrink-0">
+              <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+              <select
+                value={urgency}
+                onChange={(e) => setUrgency(e.target.value)}
+                className="w-full bg-white text-[#111827] border border-[#E5E7EB] rounded-full pl-10 pr-10 py-3 focus:outline-none focus:ring-4 focus:ring-[#10B981]/20 focus:border-[#10B981] cursor-pointer appearance-none transition-all text-sm shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+              >
+                <option value="" className="bg-white text-[#6B7280]">Urgency</option>
+                <option value="1" className="bg-white">Today</option>
+                <option value="2" className="bg-white">Tomorrow</option>
+                <option value="3" className="bg-white">Next Week</option>
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+            </div>
+
+            <div className="relative w-full md:w-48 shrink-0">
+              <Zap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+              <select
+                value={dsa}
+                onChange={(e) => setDsa(e.target.value)}
+                className="w-full bg-white text-[#111827] border border-[#E5E7EB] rounded-full pl-10 pr-10 py-3 focus:outline-none focus:ring-4 focus:ring-[#10B981]/20 focus:border-[#10B981] cursor-pointer appearance-none transition-all text-sm shadow-[0_1px_2px_rgba(17,24,39,0.06)]"
+              >
+                <option value="" className="bg-white text-[#6B7280]">Category</option>
+                <option value="1" className="bg-white">Skill Swap</option>
+                <option value="2" className="bg-white">DSA Swap</option>
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handlePost}
+              className="bg-[#10B981] hover:bg-[#059669] text-white font-bold px-8 py-3 rounded-full shadow-[0_4px_12px_rgba(16,185,129,0.2)] transition-all cursor-pointer shrink-0 w-full md:w-auto border-0 text-sm h-[46px] flex items-center justify-center"
+            >
+              Post
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Swap Feed Columns */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        >
+          {/* Left Column: Skill Swaps */}
+          <div className="bg-white p-6 lg:p-8 rounded-2xl border border-[#E5E7EB] shadow-[0_1px_2px_rgba(17,24,39,0.06)] flex flex-col min-h-[480px]">
+            <div className="flex items-center justify-between mb-6 border-b border-[#E5E7EB] pb-4">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-[#10B981]" />
+                <h2 className="text-xs font-semibold tracking-[2px] uppercase text-[#6B7280]">Skill Swaps</h2>
+              </div>
+              <span className="bg-[#10B981]/10 text-[#10B981] text-[11px] px-3 py-1 rounded-full font-bold border border-[#10B981]/20">
+                {swaps.filter((s) => s.category === "skill").length} Active
+              </span>
+            </div>
+
+            {swaps.filter((s) => s.category === "skill").length === 0 ? (
+              <div className="flex flex-col items-center justify-center text-center my-auto p-8 border border-dashed border-[#E5E7EB] rounded-2xl bg-[#F8F9FA]">
+                <Sparkles className="w-10 h-10 text-[#6B7280] opacity-40 mb-3" />
+                <p className="text-[#6B7280] font-medium text-xs">No skill swaps posted yet.</p>
+                <p className="text-[10px] text-[#6B7280] mt-1">Use the form above to post the first one!</p>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {swaps
+                  .filter((s) => s.category === "skill")
+                  .map((swap, index) => (
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      key={swap.id}
+                      className="p-5 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_1px_2px_rgba(17,24,39,0.06)] hover:shadow-[0_1px_2px_rgba(17,24,39,0.15),0_2px_8px_2px_rgba(17,24,39,0.10)] transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
+                    >
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-3 gap-4">
+                          <div>
+                            <h3 className="font-semibold text-lg text-[#111827] tracking-tight">
+                              {swap.name}
+                            </h3>
+                            <p className="text-xs text-[#6B7280] mt-0.5">
+                              {swap.college} • {swap.year || "2nd"} Year
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getUrgencyStyles(swap.urgency)}`}>
+                            {swap.urgency || "Flexible"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-[#F59E0B] font-bold mb-4 bg-[#F59E0B]/5 w-fit px-2 py-0.5 rounded-full border border-[#F59E0B]/10">
+                          <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
+                          <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating.replace("⭐", "") : swap.rating) : "5.0"}</span>
+                        </div>
+
+                        <div className="space-y-3 text-xs border-t border-[#E5E7EB] pt-4">
+                          <div>
+                            <span className="font-bold text-[#10B981] uppercase text-[9px] tracking-wider block mb-1">
+                              Offering
+                            </span>
+                            <span className="text-[#111827] font-medium text-sm block">
+                              {swap.offer}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-end pt-1 gap-4">
+                            <div>
+                              <span className="font-bold text-[#EF4444] uppercase text-[9px] tracking-wider block mb-1">
+                                Seeking
+                              </span>
+                              <span className="text-[#111827] font-medium text-sm block">
+                                {swap.need}
+                              </span>
+                            </div>
+
+                            <div className="flex gap-2 shrink-0">
+                              {(user && (user.id === swap.userId || user.fullName === swap.name || user.username === swap.name)) && (
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleDelete(swap.id)}
+                                  className="cursor-pointer bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#EF4444] text-xs p-2.5 rounded-full transition-all flex items-center justify-center shrink-0 border-0"
+                                  title="Delete Swap"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </motion.button>
+                              )}
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleMatch(swap)}
+                                className="cursor-pointer bg-[#10B981] hover:bg-[#059669] text-white text-xs px-5 py-2.5 rounded-full font-bold border-0 shadow-[0_2px_8px_rgba(16,185,129,0.15)] transition-all"
+                              >
+                                Match
+                              </motion.button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+            )}
           </div>
 
-          {swaps.filter((s) => s.category === "dsa").length === 0 ? (
-            <p className="text-[#6B7280] italic bg-[#090A0F] p-6 rounded-[12px] border border-white/5 text-center my-auto">
-              No DSA swaps posted yet. Use the form above to post the first one!
-            </p>
-          ) : (
-            <div className="space-y-5">
-              {swaps
-                .filter((s) => s.category === "dsa")
-                .map((swap, index) => (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    whileHover={{ scale: 1.02 }}
-                    key={swap.id}
-                    className="p-6 bg-gradient-to-br from-[#1a1d27] to-[#12141C] rounded-[16px] border border-white/5 hover:border-[#3b82f6]/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#3b82f6]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#3b82f6]/10 transition-all"></div>
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="font-bold text-xl text-white tracking-tight">
-                            {swap.name}
-                          </h3>
-                          <p className="text-sm text-[#6B7280] mt-1 font-medium">
-                            {swap.college} • {swap.year} Year
-                          </p>
-                        </div>
-                        <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white rounded-full border border-white/10 shadow-sm">
-                          {swap.urgency}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
-                        <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
-                      </div>
-
-                      <div className="space-y-4 text-sm border-t border-white/10 pt-5">
-                        <div>
-                          <span className="font-bold text-[#3b82f6] uppercase text-[10px] tracking-widest block mb-1.5 flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3 h-3" /> Offering
-                          </span>
-                          <span className="text-white text-base font-medium block">
-                            {swap.offer}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between items-end pt-2">
-                          <div>
-                            <span className="font-bold text-[#f87171] uppercase text-[10px] tracking-widest block mb-1.5 flex items-center gap-1.5">
-                              <Search className="w-3 h-3" /> Seeking
-                            </span>
-                            <span className="text-white text-base font-medium block">
-                              {swap.need}
-                            </span>
-                          </div>
-
-                          <div className="flex gap-2">
-                            {(user && (user.id === swap.userId || user.fullName === swap.name || user.username === swap.name)) && (
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => handleDelete(swap.id)}
-                                className="cursor-pointer bg-transparent hover:bg-red-500/10 text-red-500 text-sm p-3 rounded-[10px] transition-all flex items-center justify-center shrink-0 border border-transparent hover:border-red-500/20"
-                                title="Delete Swap"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </motion.button>
-                            )}
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleMatch(swap)}
-                              className="cursor-pointer bg-white text-black hover:bg-slate-200 text-sm px-6 py-2.5 rounded-[10px] font-bold border-0 shadow-lg transition-all tracking-wide"
-                            >
-                              Match
-                            </motion.button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+          {/* Right Column: DSA Swaps */}
+          <div className="bg-white p-6 lg:p-8 rounded-2xl border border-[#E5E7EB] shadow-[0_1px_2px_rgba(17,24,39,0.06)] flex flex-col min-h-[480px]">
+            <div className="flex items-center justify-between mb-6 border-b border-[#E5E7EB] pb-4">
+              <div className="flex items-center gap-2">
+                <Code className="w-4 h-4 text-[#3B82F6]" />
+                <h2 className="text-xs font-semibold tracking-[2px] uppercase text-[#6B7280]">DSA Swaps</h2>
+              </div>
+              <span className="bg-[#3B82F6]/10 text-[#3B82F6] text-[11px] px-3 py-1 rounded-full font-bold border border-[#3B82F6]/20">
+                {swaps.filter((s) => s.category === "dsa").length} Active
+              </span>
             </div>
-          )}
-        </div>
-      </motion.div>
+
+            {swaps.filter((s) => s.category === "dsa").length === 0 ? (
+              <div className="flex flex-col items-center justify-center text-center my-auto p-8 border border-dashed border-[#E5E7EB] rounded-2xl bg-[#F8F9FA]">
+                <Sparkles className="w-10 h-10 text-[#6B7280] opacity-40 mb-3" />
+                <p className="text-[#6B7280] font-medium text-xs">No DSA swaps posted yet.</p>
+                <p className="text-[10px] text-[#6B7280] mt-1">Use the form above to post the first one!</p>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {swaps
+                  .filter((s) => s.category === "dsa")
+                  .map((swap, index) => (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      key={swap.id}
+                      className="p-5 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_1px_2px_rgba(17,24,39,0.06)] hover:shadow-[0_1px_2px_rgba(17,24,39,0.15),0_2px_8px_2px_rgba(17,24,39,0.10)] transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
+                    >
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-3 gap-4">
+                          <div>
+                            <h3 className="font-semibold text-lg text-[#111827] tracking-tight">
+                              {swap.name}
+                            </h3>
+                            <p className="text-xs text-[#6B7280] mt-0.5">
+                              {swap.college} • {swap.year || "2nd"} Year
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getUrgencyStyles(swap.urgency)}`}>
+                            {swap.urgency || "Flexible"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-[#F59E0B] font-bold mb-4 bg-[#F59E0B]/5 w-fit px-2 py-0.5 rounded-full border border-[#F59E0B]/10">
+                          <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
+                          <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating.replace("⭐", "") : swap.rating) : "5.0"}</span>
+                        </div>
+
+                        <div className="space-y-3 text-xs border-t border-[#E5E7EB] pt-4">
+                          <div>
+                            <span className="font-bold text-[#3B82F6] uppercase text-[9px] tracking-wider block mb-1">
+                              Offering
+                            </span>
+                            <span className="text-[#111827] font-medium text-sm block">
+                              {swap.offer}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-end pt-1 gap-4">
+                            <div>
+                              <span className="font-bold text-[#EF4444] uppercase text-[9px] tracking-wider block mb-1">
+                                Seeking
+                              </span>
+                              <span className="text-[#111827] font-medium text-sm block">
+                                {swap.need}
+                              </span>
+                            </div>
+
+                            <div className="flex gap-2 shrink-0">
+                              {(user && (user.id === swap.userId || user.fullName === swap.name || user.username === swap.name)) && (
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleDelete(swap.id)}
+                                  className="cursor-pointer bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#EF4444] text-xs p-2.5 rounded-full transition-all flex items-center justify-center shrink-0 border-0"
+                                  title="Delete Swap"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </motion.button>
+                              )}
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleMatch(swap)}
+                                className="cursor-pointer bg-[#10B981] hover:bg-[#059669] text-white text-xs px-5 py-2.5 rounded-full font-bold border-0 shadow-[0_2px_8px_rgba(16,185,129,0.15)] transition-all"
+                              >
+                                Match
+                              </motion.button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+      </div>
     </div>
   );
 };

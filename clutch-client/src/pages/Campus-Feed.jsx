@@ -261,8 +261,8 @@ const CampusFeed = () => {
                       <button
                         onClick={(e) => handlePostLike(post.id, e)}
                         className={`p-1 rounded transition-colors cursor-pointer ${post.likes && dbUser && post.likes.some(like => like.userId === dbUser.id)
-                            ? "text-[#10B981] hover:text-[#10B981]/80"
-                            : "text-[#6B7280] hover:text-white"
+                          ? "text-[#10B981] hover:text-[#10B981]/80"
+                          : "text-[#6B7280] hover:text-white"
                           }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>

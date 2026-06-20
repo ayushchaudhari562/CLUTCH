@@ -80,7 +80,7 @@ const Home = ({ swaps = [] }) => {
   return (
     <>
       <div className="min-h-screen bg-transparent text-white p-4 md:p-6 lg:px-12 font-sans space-y-8 pt-24 pb-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -105,7 +105,7 @@ const Home = ({ swaps = [] }) => {
           </section>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -118,7 +118,7 @@ const Home = ({ swaps = [] }) => {
               <span className="text-white font-bold text-sm">{session}</span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3 shadow-lg">
             <Flame className="text-red-500 w-5 h-5" />
             <div className="flex flex-col">
@@ -135,7 +135,7 @@ const Home = ({ swaps = [] }) => {
             </div>
           </div>
 
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 cursor-pointer bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-6 py-3 rounded-[12px] font-bold shadow-none transition-colors ml-auto"
@@ -143,7 +143,7 @@ const Home = ({ swaps = [] }) => {
             <ShieldAlert className="w-5 h-5" />
             SOS
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -155,7 +155,7 @@ const Home = ({ swaps = [] }) => {
           </motion.button>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
@@ -164,7 +164,7 @@ const Home = ({ swaps = [] }) => {
             <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
             Recent Swap Requests
           </h2>
-          
+
           {swaps.length === 0 ? (
             <div className="bg-white/5 backdrop-blur-sm p-8 rounded-[16px] border border-white/10 text-center shadow-lg">
               <PlusCircle className="w-12 h-12 text-[#6B7280] mx-auto mb-4 opacity-50" />
@@ -182,7 +182,7 @@ const Home = ({ swaps = [] }) => {
                   </span>
                 </div>
 
-                  {swaps.filter((s) => s.category === "skill").length === 0 ? (
+                {swaps.filter((s) => s.category === "skill").length === 0 ? (
                   <p className="text-[#6B7280] italic bg-[#0E1115] p-6 rounded-[12px] border border-white/5 text-center my-auto">
                     No skill swaps posted yet.
                   </p>
@@ -200,7 +200,7 @@ const Home = ({ swaps = [] }) => {
                           className="p-6 bg-[#0E1115] rounded-[16px] border border-white/5 hover:border-emerald-500/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
                         >
                           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all"></div>
-                          
+
                           <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
@@ -215,11 +215,11 @@ const Home = ({ swaps = [] }) => {
                                 {swap.urgency}
                               </span>
                             </div>
-                            
+
                             <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
                               <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
                             </div>
-                            
+
                             <div className="space-y-4 text-sm border-t border-white/10 pt-5">
                               <div>
                                 <span className="font-bold text-[#10b981] uppercase text-[10px] tracking-widest block mb-1.5">
@@ -282,7 +282,7 @@ const Home = ({ swaps = [] }) => {
                           className="p-6 bg-[#0E1115] rounded-[16px] border border-white/5 hover:border-[#3b82f6]/40 transition-all duration-300 flex flex-col shadow-lg relative overflow-hidden group"
                         >
                           <div className="absolute top-0 right-0 w-32 h-32 bg-[#3b82f6]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#3b82f6]/10 transition-all"></div>
-                          
+
                           <div className="relative z-10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
@@ -297,11 +297,11 @@ const Home = ({ swaps = [] }) => {
                                 {swap.urgency}
                               </span>
                             </div>
-                            
+
                             <div className="flex items-center gap-1.5 text-sm text-yellow-500 font-bold mb-5">
                               <span>{swap.rating ? (swap.rating.includes("⭐") ? swap.rating : `${swap.rating} ⭐`) : "1.0 ⭐"}</span>
                             </div>
-                            
+
                             <div className="space-y-4 text-sm border-t border-white/10 pt-5">
                               <div>
                                 <span className="font-bold text-[#3b82f6] uppercase text-[10px] tracking-widest block mb-1.5">
@@ -346,7 +346,7 @@ const Home = ({ swaps = [] }) => {
 
         {/* The Match Request Popup */}
         {incomingRequest && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-[#0E1115] p-6 rounded-[12px] border border-[#2e332e] max-w-sm w-full text-white shadow-none">
               <h3 className="text-lg font-bold text-white mb-2">New Match Request</h3>
 

@@ -15,6 +15,7 @@ body {
   border: inherit;
   color: inherit;
 }
+
 /* restoring color BC colour kyun jaa rha  */
 .excalidraw .color-picker__swatch {
   background-color: var(--swatch-color) !important;
