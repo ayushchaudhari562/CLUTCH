@@ -10,13 +10,13 @@ const MatchPopup = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("MatchPopup: User loaded:", user.id, "Socket connected:", socket.connected);
+      // console.log("MatchPopup: User loaded:", user.id, "Socket connected:", socket.connected);
       if (socket.connected) {
-        console.log("MatchPopup: Socket already connected, registering user:", user.id);
+        // console.log("MatchPopup: Socket already connected, registering user:", user.id);
         socket.emit("register", user.id);
       }
       const onConnect = () => {
-        console.log("MatchPopup: Socket connected event, registering user:", user.id);
+        // console.log("MatchPopup: Socket connected event, registering user:", user.id);
         socket.emit("register", user.id);
       };
       socket.on("connect", onConnect);
@@ -27,7 +27,7 @@ const MatchPopup = () => {
 
   useEffect(() => {
     const handleIncoming = (data) => {
-      console.log("MatchPopup: Received incoming-match-request event:", data);
+      // console.log("MatchPopup: Received incoming-match-request event:", data);
       setIncomingRequest(data);
     };
     const handleAccepted = (roomId) => {

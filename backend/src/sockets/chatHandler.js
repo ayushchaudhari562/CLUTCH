@@ -23,7 +23,7 @@ module.exports = (io) => {
       console.log(`Backend: request-match event received from Socket: ${socket.id}. Requester: ${data.requesterName}. Target User ID: ${data.targetUserId}`);
       // Emit to the target user's ID room (which they joined on register)
       io.to(data.targetUserId).emit("incoming-match-request", data);
-      console.log(`Backend: Forwarded incoming-match-request to User ID Room: ${data.targetUserId}`);
+      console.log(`Backend: Forwarded incoming-match-request to User D Room: ${data.targetUserId}`);
     });
     //now for person who had posted will decide to 
     // accept or reject it

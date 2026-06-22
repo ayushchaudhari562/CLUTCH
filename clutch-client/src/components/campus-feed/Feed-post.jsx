@@ -50,8 +50,8 @@ const Feedpost = ({ onClose }) => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("Success:", data);
-                onClose(); // Close modal on successful post creation
+                // console.log("Success:", data);
+                onClose(); 
             } else {
                 console.error("Failed to post");
                 alert("Failed to post");

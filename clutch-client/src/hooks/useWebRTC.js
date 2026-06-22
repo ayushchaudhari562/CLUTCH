@@ -157,7 +157,7 @@ export const useWebRTC = (roomId) => {
     //..
     //..
     pc.ontrack = (event) => {
-      console.log("Got remote track!", event.streams[0]);
+      // console.log("Got remote track!", event.streams[0]);
       setRemoteStream(event.streams[0]);
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
@@ -244,7 +244,7 @@ export const useWebRTC = (roomId) => {
     //..
     //..
     socket.on("user-joined", (userID) => {
-      console.log("remote user joined: ", userID);
+      // console.log("remote user joined: ", userID);
       setIncomingCall(userID);
     });
 
@@ -254,7 +254,7 @@ export const useWebRTC = (roomId) => {
     //..
     //..
     socket.on("webrtc-offer", async ({ offer }) => {
-      console.log("Received an offer, creating answer");
+      // console.log("Received an offer, creating answer");
       
       // Main apna connection engine ready kar raha hu
       const pc = createPeerConnection();
@@ -278,7 +278,7 @@ export const useWebRTC = (roomId) => {
     //..
     //..
     socket.on("webrtc-answer", async ({ answer }) => {
-      console.log("answer recived: ", answer);
+      // console.log("answer recived: ", answer);
       
       // Agar mera connection abhi zinda hai, toh unka answer "Remote Description" me set kar dunga
       if (peerConnectionRef.current) {
