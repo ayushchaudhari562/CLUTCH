@@ -44,7 +44,7 @@ const Whiteboard = ({ roomId }) => {
   };
 
   return (
-    <div className="flex-1 bg-[#090A0F] rounded-[12px] border border-white/5 relative overflow-hidden flex flex-col shadow-none">
+    <div className="flex-1 bg-background rounded-[16px] border border-white/5 relative overflow-hidden flex flex-col shadow-none">
       <Excalidraw
         theme="dark"
         excalidrawAPI={(api) => setExcalidraw(api)}

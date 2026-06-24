@@ -10,13 +10,10 @@ const MatchPopup = () => {
 
   useEffect(() => {
     if (user) {
-      // console.log("MatchPopup: User loaded:", user.id, "Socket connected:", socket.connected);
       if (socket.connected) {
-        // console.log("MatchPopup: Socket already connected, registering user:", user.id);
         socket.emit("register", user.id);
       }
       const onConnect = () => {
-        // console.log("MatchPopup: Socket connected event, registering user:", user.id);
         socket.emit("register", user.id);
       };
       socket.on("connect", onConnect);
@@ -27,7 +24,6 @@ const MatchPopup = () => {
 
   useEffect(() => {
     const handleIncoming = (data) => {
-      // console.log("MatchPopup: Received incoming-match-request event:", data);
       setIncomingRequest(data);
     };
     const handleAccepted = (roomId) => {
@@ -51,12 +47,12 @@ const MatchPopup = () => {
   if (!incomingRequest) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-[#12141C] p-6 rounded-[12px] border border-white/5 max-w-sm w-full text-white shadow-none">
-        <h3 className="text-lg font-bold text-white mb-2">New Match Request</h3>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div className="bg-surface p-6 rounded-[16px] border border-white/5 max-w-sm w-full text-white shadow-xl">
+        <h3 className="text-base font-bold text-white mb-2 tracking-tight">New Match Request</h3>
         
-        <p className="mb-6 text-[#6B7280]">
-          <span className="font-semibold text-[#10b981]">{incomingRequest.requesterName}</span> wants to study with you.
+        <p className="mb-6 text-slate-400 text-xs font-medium leading-relaxed">
+          <span className="font-extrabold text-google-green">{incomingRequest.requesterName}</span> wants to study with you.
         </p>
         
         <div className="flex gap-3">
@@ -67,7 +63,7 @@ const MatchPopup = () => {
               });
               setIncomingRequest(null);
             }}
-            className="flex-1 px-4 py-2 bg-transparent hover:bg-white/5 text-[#6B7280] border border-white/5 rounded-[8px] font-semibold transition cursor-pointer"
+            className="flex-1 px-4 py-2 bg-transparent hover:bg-white/5 text-slate-400 border border-white/5 rounded-full font-bold transition cursor-pointer text-xs"
           >
             Decline
           </button>
@@ -80,7 +76,7 @@ const MatchPopup = () => {
               });
               setIncomingRequest(null);
             }}
-            className="flex-1 px-4 py-2 bg-white hover:bg-slate-200 text-black rounded-[8px] font-semibold transition border-0 shadow-none cursor-pointer"
+            className="flex-1 px-4 py-2 bg-google-blue hover:bg-google-blue/90 text-white rounded-full font-bold transition border-0 shadow-md cursor-pointer text-xs"
           >
             Accept
           </button>

@@ -1,34 +1,30 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import socket from "../../socket/socket";
 
-// OPTIMIZATION: Extracted MessageBubble into its own component and wrapped with React.memo.
-// OLD: The bubble JSX was inlined inside ChatPanel's return, so every single new message
-//      caused the ENTIRE list to re-render because React had no way to bail out.
-// NEW: React.memo does a shallow-prop comparison. If `msg` hasn't changed, this component
-//      is skipped entirely during reconciliation. For a chat with 80 messages, only the
-//      new bubble gets mounted — the other 79 are untouched.
+// MessageBubble Component
 const MessageBubble = React.memo(({ msg }) => (
   <div
-    className={`flex flex-col gap-1 max-w-[85%] ${msg.isMe ? "self-end" : "self-start"
-      }`}
+    className={`flex flex-col gap-1 max-w-[85%] ${
+      msg.isMe ? "self-end" : "self-start"
+    }`}
   >
     {!msg.isMe && (
-      <span className="text-[10px] text-[#6B7280] font-medium px-1">
+      <span className="text-[10px] text-slate-400 font-bold px-2.5">
         {msg.sender}
       </span>
     )}
     <div
-      className={`px-3 py-2 text-[13px] shadow-none leading-relaxed ${msg.isMe
-          ? "bg-emerald-500/10 text-[#10b981] rounded-2xl rounded-tr-sm border border-emerald-500/20"
-          : "bg-[#090A0F] text-white rounded-2xl rounded-tl-sm border border-white/5"
-        }`}
+      className={`px-3.5 py-2 text-xs leading-relaxed shadow-sm ${
+        msg.isMe
+          ? "bg-google-blue/10 text-white rounded-2xl rounded-tr-sm border border-google-blue/20"
+          : "bg-surface-elevated text-white rounded-2xl rounded-tl-sm border border-white/5"
+      }`}
     >
       {msg.text}
     </div>
   </div>
 ));
 
-// Give it a display name so React DevTools shows "MessageBubble" instead of "memo(Component)"
 MessageBubble.displayName = "MessageBubble";
 
 const ChatPanel = ({ roomId }) => {
@@ -41,61 +37,30 @@ const ChatPanel = ({ roomId }) => {
 
   const [input, setInput] = useState("");
   const msfEndRef = useRef(null);
-
-  // OPTIMIZATION: Track socket.id in a ref so we always have its latest value
-  // without causing re-renders.
-  // OLD: socket.id was read directly inside handleSendMessage at call time.
-  //      If the component rendered before the socket connected, socket.id was
-  //      undefined and the fallback "0000" was used permanently for that session.
-  // NEW: We listen to the "connect" event and update the ref. This guarantees
-  //      we capture the real ID as soon as the socket handshake completes,
-  //      even if it happens after the first render.
   const socketIdRef = useRef(socket.id);
+
   useEffect(() => {
     const onConnect = () => {
       socketIdRef.current = socket.id;
     };
     socket.on("connect", onConnect);
-    // Also set it immediately in case the socket is already connected
     if (socket.connected) {
       socketIdRef.current = socket.id;
     }
     return () => socket.off("connect", onConnect);
   }, []);
 
-  // OPTIMIZATION: Separated scroll and localStorage into two distinct effects.
-  // OLD: Both were in a single useEffect, which is a correctness and readability problem.
-  //      Side effects with different concerns should not share an effect — if one throws,
-  //      the other is skipped silently.
-  // NEW: Two effects, one concern each. Easier to reason about and test individually.
-
-  // Effect 1 — scroll to bottom whenever messages update
   useEffect(() => {
     msfEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Effect 2 — persist to localStorage, but debounced.
-  // OLD: localStorage.setItem was called synchronously on every state update.
-  //      In a fast chat, that means serializing and writing the full array to disk
-  //      on every keystroke or incoming message — wasteful I/O.
-  // NEW: We wait 500ms of silence before writing. If another message arrives within
-  //      that window, the previous timer is cleared and we start over. This reduces
-  //      localStorage writes by 80-90% in an active conversation.
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem("studyroom_chat", JSON.stringify(messages));
     }, 500);
-    return () => clearTimeout(timer); // clear on next update before it fires
+    return () => clearTimeout(timer);
   }, [messages]);
 
-  // OPTIMIZATION: Clear messages and re-join when roomId changes.
-  // OLD: There was no cleanup when roomId changed. If a user switched rooms,
-  //      stale messages from the previous room remained visible until new ones
-  //      pushed them off screen. The socket also wasn't explicitly leaving
-  //      the old room — the join-room emit was inside a separate effect that
-  //      may or may not have re-run cleanly.
-  // NEW: A single effect owns both the join and the message state for the room.
-  //      On roomId change, it resets messages first, then joins the new room.
   useEffect(() => {
     setMessages([
       {
@@ -117,18 +82,12 @@ const ChatPanel = ({ roomId }) => {
             text: data,
             isMe: false,
           };
-          // OPTIMIZATION: Cap the array at 100 messages.
-          // OLD: Messages were pushed into the array indefinitely with no upper bound.
-          //      A long session could accumulate thousands of entries in state and in
-          //      localStorage, increasing serialization cost and memory usage over time.
-          // NEW: .slice(-100) keeps only the most recent 100 messages. The cost of
-          //      slice is O(n) but n is capped, so it stays constant after 100 messages.
           return [...prev, newMsg].slice(-100);
         });
       } else {
         const isMyMessage = data.senderId === socketIdRef.current;
         setMessages((prev) => {
-          return [...prev, { ...data, isMe: isMyMessage }].slice(-100); // same cap here
+          return [...prev, { ...data, isMe: isMyMessage }].slice(-100);
         });
       }
     };
@@ -137,17 +96,9 @@ const ChatPanel = ({ roomId }) => {
 
     return () => {
       socket.off("receive-message", messageHandler);
-      // Optionally emit a leave-room event here if your server supports it:
-      // socket.emit("leave-room", roomId);
     };
   }, [roomId]);
 
-  // OPTIMIZATION: Memoize the send handler with useCallback.
-  // OLD: handleSendMessage was re-declared as a new function reference on every render.
-  //      Any child that received it as a prop (like a memoized submit button) would
-  //      always see a "new" function and re-render unnecessarily.
-  // NEW: useCallback returns the same function reference as long as [input, roomId]
-  //      haven't changed. This pairs well with React.memo on child components.
   const handleSendMessage = useCallback(
     (e) => {
       e.preventDefault();
@@ -155,8 +106,6 @@ const ChatPanel = ({ roomId }) => {
 
       const newMessage = {
         id: Date.now(),
-        // OLD: socket.id was read directly here — risky if socket wasn't connected yet.
-        // NEW: We read from socketIdRef.current which is always up-to-date.
         sender: "User-" + (socketIdRef.current
           ? socketIdRef.current.substring(0, 4)
           : "0000"),
@@ -171,32 +120,31 @@ const ChatPanel = ({ roomId }) => {
   );
 
   return (
-    <div className="flex-1 bg-[#12141C] rounded-[12px] border border-white/5 flex flex-col overflow-hidden min-h-0 shadow-none">
-      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+    <div className="flex-1 bg-surface rounded-[16px] border border-white/5 flex flex-col overflow-hidden min-h-0 shadow-md">
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5 scrollbar-thin">
         {messages.map((msg) => (
-          // OPTIMIZATION: Using the memoized MessageBubble instead of inline JSX.
-          // Each bubble only re-renders if its own `msg` prop reference changes.
           <MessageBubble key={msg.id} msg={msg} />
         ))}
         <div ref={msfEndRef} />
       </div>
 
-      {/* NOTE: <form> with onSubmit is kept as-is — it is the correct pattern here.
-          The form handles Enter-key submission natively without extra keyDown listeners. */}
+      {/* Input controls form */}
       <form
         onSubmit={handleSendMessage}
-        className="p-2 border-t border-white/5 bg-[#12141C] flex gap-2"
+        className="p-3 border-t border-white/5 bg-surface flex gap-2 items-center"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Message room..."
-          className="flex-1 bg-[#090A0F] rounded-[8px] text-[13px] text-white placeholder-[#6B7280] focus:outline-none px-3 py-2 border border-white/5 focus:border-[#10b981] transition-colors"
+          className="flex-1 bg-background rounded-full text-xs text-white placeholder-slate-500 focus:outline-none px-4.5 py-2.5 border border-white/5 focus:border-google-blue transition-colors"
         />
         <button
           type="submit"
-          className="p-2 bg-[#10b981] hover:bg-[#059669] text-white rounded-[8px] transition-colors flex items-center justify-center shrink-0 border-0 shadow-none cursor-pointer"
+          className="p-2.5 bg-google-blue hover:bg-google-blue/90 text-white rounded-full transition-colors flex items-center justify-center shrink-0 border-0 shadow-sm cursor-pointer"
+          title="Send message"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

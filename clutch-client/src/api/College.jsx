@@ -72,33 +72,33 @@ const CollegeSelector = () => {
     };
 
     return(
-        <div className="p-8 max-w-lg mx-auto mt-24 bg-[#12141C] rounded-[12px] border border-white/5 text-white shadow-none font-sans">
-            <h1 className="text-xl font-bold text-white mb-4">Which college do you attend?</h1>
+        <div className="p-8 max-w-lg mx-auto mt-24 bg-surface rounded-[16px] border border-white/5 text-white shadow-md font-sans">
+            <h1 className="text-lg font-extrabold text-white mb-4">Which college do you attend?</h1>
             
             <input 
                 type="text" 
                 placeholder="Search College..." 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                className="w-full bg-[#090A0F] text-white placeholder-[#6B7280] border border-white/5 rounded-[8px] p-3 mb-4 focus:outline-none focus:border-[#10b981] transition-colors"
+                className="w-full bg-background text-white placeholder-slate-500 border border-white/5 rounded-full px-4 py-2.5 mb-4 focus:outline-none focus:border-google-blue transition-colors text-xs"
             />
 
-            {isLoading && <p className="text-[#6B7280] mb-2 text-sm">Searching database...</p>}
+            {isLoading && <p className="text-slate-500 mb-2 text-xs font-bold">Searching database...</p>}
 
-            <ul className="bg-[#090A0F] border border-white/5 rounded-[8px] overflow-hidden max-h-80 overflow-y-auto text-white list-none p-0 m-0">
+            <ul className="bg-background border border-white/5 rounded-[12px] overflow-hidden max-h-80 overflow-y-auto text-white list-none p-0 m-0 scrollbar-thin">
                 {allColleges.map((college) => (
                     <li 
                         key={college.id} 
                         onClick={() => handleSelectCollege(college.name)}
-                        className="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer flex items-center justify-between text-sm transition-colors duration-150"
+                        className="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer flex items-center justify-between text-xs transition-colors duration-150"
                     >
-                        <span className="text-white font-medium">{college.name}</span>
-                        <span className="text-[10px] text-[#6B7280] bg-white/5 px-2.5 py-0.5 rounded-[6px]">Code: {college.id}</span>
+                        <span className="text-slate-300 font-bold">{college.name}</span>
+                        <span className="text-[9px] text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">Code: {college.id}</span>
                     </li>
                 ))}
                 
                 {allColleges.length === 0 && !isLoading && (
-                    <li className="p-3 text-[#6B7280] text-sm">No colleges found.</li>
+                    <li className="p-3 text-slate-500 text-xs font-bold">No colleges found.</li>
                 )}
             </ul>
         </div>

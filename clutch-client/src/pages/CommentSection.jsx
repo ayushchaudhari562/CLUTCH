@@ -109,86 +109,84 @@ const CommentSection = ({ comment, isReply = false }) => {
 
   if (isCollapsed) {
     return (
-      <div className="flex gap-2 items-center text-xs mt-3 mb-1 bg-[#12141C] border border-white/5 p-1.5 rounded-[20px] inline-flex cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setIsCollapsed(false)}>
-        <div className="w-5 h-5 rounded-[50%] bg-emerald-500/10 flex items-center justify-center text-[#10b981] shrink-0 text-[10px] font-bold">
+      <div 
+        className="flex gap-2 items-center text-[11px] mt-2 mb-1 bg-surface-elevated border border-white/5 px-3 py-1.5 rounded-full inline-flex cursor-pointer hover:bg-white/10 transition-colors" 
+        onClick={() => setIsCollapsed(false)}
+      >
+        <div className="w-4 h-4 rounded-full bg-google-green/10 flex items-center justify-center text-google-green shrink-0 text-[8px] font-bold">
           {comment.author.charAt(0).toUpperCase()}
         </div>
         <span className="font-bold text-white">{comment.author}</span>
-        <span className="text-[#6B7280]">• 2y ago</span>
-        <span className="text-[#6B7280] italic px-2">+{localReplies.length + 1} collapsed</span>
+        <span className="text-slate-500">• 2m ago</span>
+        <span className="text-google-blue font-bold tracking-wide pl-1.5">+{localReplies.length + 1} replies collapsed</span>
       </div>
     );
   }
 
   return (
-    <div className={`text-sm text-white font-sans w-full ${isReply ? 'pt-2' : 'mt-4'}`}>
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-7 h-7 rounded-[50%] bg-emerald-500/10 flex items-center justify-center text-[#10b981] font-bold text-xs shrink-0 z-10 relative">
+    <div className={`text-xs text-white font-sans w-full ${isReply ? 'pt-2' : 'mt-4'}`}>
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className="w-6 h-6 rounded-full bg-google-green/10 flex items-center justify-center text-google-green font-bold text-[10px] shrink-0 z-10 relative border border-google-green/20">
           {comment.author.charAt(0).toUpperCase()}
         </div>
-        <span className="font-bold text-white cursor-pointer hover:underline text-[13px]">{comment.author}</span>
-        <span className="text-[#6B7280] text-xs">•{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <span className="font-bold text-white cursor-pointer hover:underline text-[12px]">{comment.author}</span>
+        <span className="text-slate-500 text-[10px]">• {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
       </div>
 
       <div className="flex">
-        <div className="w-7 flex justify-center shrink-0 relative z-0">
+        <div className="w-6 flex justify-center shrink-0 relative z-0">
           {showReplies && localReplies.length > 0 && (
-            <div className="w-[2px] bg-white/5 absolute top-0 bottom-0"></div>
+            <div className="w-[1.5px] bg-white/10 absolute top-0 bottom-0"></div>
           )}
         </div>
 
-        <div className="flex-1 pl-2 pb-2">
+        <div className="flex-1 pl-3.5 pb-2">
           {isEditing ? (
             <div className="mb-2 mr-4">
               <input
                 type="text"
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
-                className="w-full bg-[#090A0F] text-white px-3 py-2 rounded-[8px] border border-white/5 focus:border-[#10b981] outline-none"
+                className="w-full bg-background text-white px-3 py-2 rounded-[8px] border border-white/5 focus:border-google-blue outline-none text-xs"
               />
               <div className="flex gap-2 mt-2">
-                <button onClick={handleEditSave} className="text-xs bg-white hover:bg-slate-200 text-black px-3 py-1.5 rounded-[8px] font-medium border-0 shadow-none cursor-pointer">Save Edit</button>
-                <button onClick={() => setIsEditing(false)} className="text-xs bg-transparent text-[#6B7280] border border-white/10 rounded-[8px] px-3 py-1.5 cursor-pointer hover:bg-white/5">Cancel</button>
+                <button onClick={handleEditSave} className="text-[10px] bg-google-blue hover:bg-google-blue/90 text-white px-3 py-1.5 rounded-full font-bold border-0 shadow-sm cursor-pointer">Save Edit</button>
+                <button onClick={() => setIsEditing(false)} className="text-[10px] bg-transparent text-slate-400 border border-white/5 rounded-full px-3 py-1.5 cursor-pointer hover:bg-white/5 font-bold">Cancel</button>
               </div>
             </div>
           ) : (
-            <div className="text-white text-[14px] leading-relaxed mb-1.5 whitespace-pre-wrap mr-4">
+            <div className="text-slate-200 text-xs leading-relaxed mb-2 whitespace-pre-wrap mr-4 font-medium">
               {currentText}
             </div>
           )}
 
-          {/* Action Bar */}
-          <div className="flex items-center gap-1 text-xs text-[#6B7280] font-bold mb-2 -ml-1">
-            <button onClick={() => setIsCollapsed(true)} className="flex items-center justify-center w-[18px] h-[18px] rounded-[50%] border border-white/5 hover:border-[#6B7280] text-[#6B7280] hover:text-white transition-colors mr-1 cursor-pointer" title="Collapse">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M20 12H4"></path></svg>
+          {/* Action pill triggers */}
+          <div className="flex items-center gap-1 text-[10px] text-slate-500 font-bold mb-2 -ml-1">
+            <button onClick={() => setIsCollapsed(true)} className="flex items-center justify-center w-5 h-5 rounded-full border border-white/5 hover:border-slate-400 text-slate-500 hover:text-white transition-all mr-1 cursor-pointer" title="Collapse thread">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20 12H4"></path></svg>
             </button>
             <button
               onClick={handleCommentLike}
-              className={`flex items-center gap-1 hover:bg-white/5 p-1.5 rounded-[8px] transition-colors group cursor-pointer ${dbUser && likedUserIds.includes(dbUser.id) ? "text-[#10b981]" : "text-[#6B7280]"
-                }`}
+              className={`flex items-center gap-1 hover:bg-white/5 px-2 py-1.5 rounded-full transition-all group cursor-pointer ${
+                dbUser && likedUserIds.includes(dbUser.id) ? "text-google-green bg-google-green/10" : "text-slate-400"
+              }`}
             >
-              <svg className="w-5 h-5 group-hover:text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path></svg>
-            </button>
-            <span className={`font-medium text-[13px] ${dbUser && likedUserIds.includes(dbUser.id) ? "text-[#10b981]" : "text-[#6B7280]"
-              }`}>
-              {likesCount}
-            </span>
-            <button className="flex items-center gap-1 hover:bg-white/5 p-1.5 rounded-[8px] transition-colors group cursor-pointer">
-              <svg className="w-5 h-5 group-hover:text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              <svg className="w-4 h-4 group-hover:text-google-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7"></path></svg>
+              <span>{likesCount}</span>
             </button>
 
-            <button onClick={() => setIsReplying(!isReplying)} className="flex items-center gap-1.5 hover:bg-white/5 py-1.5 px-2 rounded-[8px] transition-colors ml-1 cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-              Reply
+            <button onClick={() => setIsReplying(!isReplying)} className="flex items-center gap-1.5 hover:bg-white/5 py-1.5 px-2.5 rounded-full transition-all ml-1 cursor-pointer text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+              <span>Reply</span>
             </button>
 
-            <button onClick={() => setIsEditing(!isEditing)} className="flex items-center gap-1.5 hover:bg-white/5 py-1.5 px-2 rounded-[8px] transition-colors cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-              Edit
+            <button onClick={() => setIsEditing(!isEditing)} className="flex items-center gap-1.5 hover:bg-white/5 py-1.5 px-2.5 rounded-full transition-all cursor-pointer text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+              <span>Edit</span>
             </button>
           </div>
 
-          {/* Reply Input Box */}
+          {/* Reply Text input */}
           {isReplying && (
             <div className="mt-1 flex gap-2 mb-3 mr-4">
               <input
@@ -196,26 +194,26 @@ const CommentSection = ({ comment, isReply = false }) => {
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder={`Reply to ${comment.author}...`}
-                className="flex-1 bg-[#090A0F] text-sm text-white px-3 py-2 rounded-[8px] border border-white/5 focus:border-[#10b981] outline-none"
+                className="flex-1 bg-background text-xs text-white px-3 py-2 border border-white/5 focus:border-google-blue rounded-[8px] outline-none"
               />
-              <button onClick={handlePostReply} className="text-sm bg-white hover:bg-slate-200 text-black px-4 py-2 rounded-[8px] font-medium transition-colors border-0 shadow-none cursor-pointer">Reply</button>
+              <button onClick={handlePostReply} className="text-[10px] bg-google-blue hover:bg-google-blue/90 text-white px-4 py-2 rounded-full font-bold transition-all border-0 shadow-sm cursor-pointer">Reply</button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Replies Container (Tree Branching Logic) */}
+      {/* Nested Replies tree branching renderer */}
       {showReplies && localReplies.length > 0 && (
-        <div className="pl-[13px] relative z-0">
+        <div className="pl-[11px] relative z-0">
           {localReplies.map((reply, idx) => {
             const isLast = idx === localReplies.length - 1;
             return (
               <div key={reply.id} className="relative">
                 {!isLast && (
-                  <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-white/5 z-0"></div>
+                  <div className="absolute top-0 bottom-0 left-0 w-[1.5px] bg-white/10 z-0"></div>
                 )}
 
-                <div className="absolute top-0 left-0 w-[23px] h-[22px] border-l-2 border-b-2 border-white/5 rounded-bl-[12px] border-t-0 border-r-0 z-0"></div>
+                <div className="absolute top-0 left-0 w-[23px] h-[22px] border-l-2 border-b-2 border-white/10 rounded-bl-[12px] border-t-0 border-r-0 z-0"></div>
 
                 <div className="pl-[23px]">
                   <CommentSection comment={reply} isReply={true} />
