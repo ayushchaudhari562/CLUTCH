@@ -50,11 +50,9 @@ const Whiteboard = ({ roomId }) => {
       return;
     }
 
-    // Smooth Debouncing (Wait 30ms before sending to avoid crashing the server)
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
     debounceTimer.current = setTimeout(() => {
-      // Emit to the backend!
       socket.emit("excalidraw-update", { roomId, elements });
       console.log("Emitted excalidraw-update to room:", roomId, "with elements:", elements);
     }, 30);//ye imp hai for debugging

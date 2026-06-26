@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "vercel-build": "npm install --prefix clutch-client && npm run build --prefix clutch-client",
     "build": "npm run build --prefix clutch-client",
     "dev:client": "npm run dev --prefix clutch-client",
     "dev:server": "npm run dev --prefix backend"
