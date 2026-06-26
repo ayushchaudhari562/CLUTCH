@@ -1,5 +1,5 @@
 module.exports = (io) => {
-    io.on("connection", (socket) => //simple for making connection in room;
+    io.on("connection", (socket) => 
         {
 
             //...

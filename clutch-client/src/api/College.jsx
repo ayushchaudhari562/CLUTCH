@@ -67,6 +67,7 @@ const CollegeSelector = () => {
 
         // ...
         // Step 4: Jab college save ho jaye, to user ko Campus Feed wale page par bhej do!
+        //abhi cf pr hi krunga 
         // ...
         navigate("/campus-feed");
     };

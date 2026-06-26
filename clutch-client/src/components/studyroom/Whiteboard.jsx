@@ -15,9 +15,31 @@ const Whiteboard = ({ roomId }) => {
   useEffect(() => {
     if (!excalidrawAPI) return; // Wait until Excalidraw is fully loaded
 
-    const handleExcalidrawUpdate = (elements) => {
-      isUpdatingFromSocket.current = true; // Mark update from network
-      excalidrawAPI.updateScene({ elements });
+    const handleExcalidrawUpdate = (incomingElements) => {
+      isUpdatingFromSocket.current = true; 
+      
+      // Get the elements currently on this user's screen
+      const localElements = excalidrawAPI.getSceneElements();
+      
+      // Create a map to combine them by ID
+      const elementMap = {};
+      
+      // 1. Add all local elements
+      localElements.forEach(el => {
+        elementMap[el.id] = el;
+      });
+      
+      // 2. Add incoming elements, keeping whoever has the higher version
+      incomingElements.forEach(el => {
+        const localEl = elementMap[el.id];
+        if (!localEl || el.version > localEl.version) {
+          elementMap[el.id] = el;
+        }
+      });
+      
+      // 3. Convert back to array and update the scene!
+      const mergedElements = Object.values(elementMap);
+      excalidrawAPI.updateScene({ elements: mergedElements });
     };
 
     socket.on("excalidraw-update", handleExcalidrawUpdate);
@@ -40,6 +62,7 @@ const Whiteboard = ({ roomId }) => {
     debounceTimer.current = setTimeout(() => {
       // Emit to the backend!
       socket.emit("excalidraw-update", { roomId, elements });
+      console.log("Emitted excalidraw-update to room:", roomId, "with elements:", elements);
     }, 30);//ye imp hai for debugging
   };
 
