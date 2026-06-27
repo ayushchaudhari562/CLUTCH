@@ -16,6 +16,7 @@ export const useWebRTC = (roomId) => {
   const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const iceCandidateQueue = useRef([]); 
+  const localStreamRef = useRef(null);
 
   const rtcConfig = {
     iceServers: [
@@ -48,6 +49,10 @@ export const useWebRTC = (roomId) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    localStreamRef.current = localStream;
+  }, [localStream]);
 
   const toggleVideo = () => {
     if (localStream) {
@@ -112,28 +117,29 @@ export const useWebRTC = (roomId) => {
       }
     };
 
-    // Let the browser automatically manage when we need to send an offer!
-    pc.onnegotiationneeded = async () => {
-      try {
-        if (pc.signalingState !== "stable") return;
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        socket.emit("webrtc-offer", { roomId, offer });
-      } catch (err) {
-        console.error("Negotiation error:", err);
-      }
-    };
-
     peerConnectionRef.current = pc;
     return pc;
   };
 
-  const acceptCall = () => {
+  const acceptCall = async () => {
     if (!incomingCall) return;
     
-    // Creating the connection will add local tracks. 
-    // This triggers onnegotiationneeded, which will automatically send the Offer!
-    createPeerConnection();
+    // Wait for the camera to be ready before initiating the call (up to 5 seconds)
+    let attempts = 0;
+    while (!localStreamRef.current && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    const pc = createPeerConnection();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    
+    socket.emit("webrtc-offer", {
+      targetSocketId: incomingCall,
+      offer,
+      roomId,
+    });
     
     setIncomingCall(null);
   };
@@ -150,6 +156,13 @@ export const useWebRTC = (roomId) => {
     });
 
     socket.on("webrtc-offer", async ({ offer }) => {
+      // Wait for the camera to be ready before answering (up to 5 seconds)
+      let attempts = 0;
+      while (!localStreamRef.current && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
       let pc = peerConnectionRef.current;
       if (!pc) {
         pc = createPeerConnection();
