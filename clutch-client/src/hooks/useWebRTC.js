@@ -69,31 +69,17 @@ export const useWebRTC = (roomId) => {
     }
   };
 
+  // Add tracks automatically when localStream becomes available
   useEffect(() => {
     if (localStream && peerConnectionRef.current) {
       const senders = peerConnectionRef.current.getSenders();
-      let tracksAdded = false;
       
       localStream.getTracks().forEach((track) => {
         const trackAlreadyAdded = senders.some((sender) => sender.track && sender.track.kind === track.kind);
         if (!trackAlreadyAdded) {
           peerConnectionRef.current.addTrack(track, localStream);
-          tracksAdded = true;
         }
       });
-
-      if (tracksAdded && peerConnectionRef.current.signalingState === "stable") {
-        const renegotiate = async () => {
-          try {
-            const offer = await peerConnectionRef.current.createOffer();
-            await peerConnectionRef.current.setLocalDescription(offer);
-            socket.emit("webrtc-offer", { roomId, offer });
-          } catch (e) {
-            console.error(e);
-          }
-        };
-        renegotiate();
-      }
     }
   }, [localStream]);
 
@@ -126,22 +112,28 @@ export const useWebRTC = (roomId) => {
       }
     };
 
+    // Let the browser automatically manage when we need to send an offer!
+    pc.onnegotiationneeded = async () => {
+      try {
+        if (pc.signalingState !== "stable") return;
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit("webrtc-offer", { roomId, offer });
+      } catch (err) {
+        console.error("Negotiation error:", err);
+      }
+    };
+
     peerConnectionRef.current = pc;
     return pc;
   };
 
-  const acceptCall = async () => {
+  const acceptCall = () => {
     if (!incomingCall) return;
     
-    const pc = createPeerConnection();
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    
-    socket.emit("webrtc-offer", {
-      targetSocketId: incomingCall,
-      offer,
-      roomId,
-    });
+    // Creating the connection will add local tracks. 
+    // This triggers onnegotiationneeded, which will automatically send the Offer!
+    createPeerConnection();
     
     setIncomingCall(null);
   };
