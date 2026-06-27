@@ -95,9 +95,10 @@ export const useWebRTC = (roomId) => {
 
     const pc = new RTCPeerConnection(rtcConfig);
 
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
+    const currentStream = localStreamRef.current;
+    if (currentStream) {
+      currentStream.getTracks().forEach((track) => {
+        pc.addTrack(track, currentStream);
       });
     }
 
