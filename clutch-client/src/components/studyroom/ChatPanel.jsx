@@ -4,8 +4,9 @@ import socket from "../../socket/socket";
 // MessageBubble Component
 const MessageBubble = React.memo(({ msg }) => (
   <div
-    className={`flex flex-col gap-1 max-w-[85%] ${msg.isMe ? "self-end" : "self-start"
-      }`}
+    className={`flex flex-col gap-1 max-w-[85%] ${
+      msg.isMe ? "self-end" : "self-start"
+    }`}
   >
     {!msg.isMe && (
       <span className="text-[10px] text-slate-400 font-bold px-2.5">
@@ -13,10 +14,11 @@ const MessageBubble = React.memo(({ msg }) => (
       </span>
     )}
     <div
-      className={`px-3.5 py-2 text-xs leading-relaxed shadow-sm ${msg.isMe
+      className={`px-3.5 py-2 text-xs leading-relaxed shadow-sm ${
+        msg.isMe
           ? "bg-google-blue/10 text-white rounded-2xl rounded-tr-sm border border-google-blue/20"
           : "bg-surface-elevated text-white rounded-2xl rounded-tl-sm border border-white/5"
-        }`}
+      }`}
     >
       {msg.text}
     </div>

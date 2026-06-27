@@ -45,20 +45,20 @@ module.exports = (io) => {
 
     //for handling the webrtc offering and answering calls
     //call feautre
-    socket.on("webrtc-offer",({roomId,offer,targetSocketId})=>{
+    socket.on("webrtc-offer", ({ roomId, offer, targetSocketId }) => {
       if (targetSocketId) {
         socket.to(targetSocketId).emit("webrtc-offer", { offer });
       } else {
-        socket.to(roomId).emit("webrtc-offer",{offer});
+        socket.to(roomId).emit("webrtc-offer", { offer });
       }
     });
 
-    socket.on("webrtc-answer",({roomId,answer})=>{
-      socket.to(roomId).emit("webrtc-answer",{answer})
+    socket.on("webrtc-answer", ({ roomId, answer }) => {
+      socket.to(roomId).emit("webrtc-answer", { answer })
     });
-    
-    socket.on("webrtc-ice-candidate",({roomId,candidate})=>{
-      socket.to(roomId).emit("webrtc-ice-candidate",{candidate});
+
+    socket.on("webrtc-ice-candidate", ({ roomId, candidate }) => {
+      socket.to(roomId).emit("webrtc-ice-candidate", { candidate });
     });
 
     socket.on("reject-call", ({ targetSocketId }) => {
