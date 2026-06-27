@@ -9,7 +9,6 @@ const VideoPanel = ({
   return (
     <div className="flex gap-3 h-[180px] shrink-0">
       
-      {/* Remote Participant stream */}
       <div className="flex-1 bg-surface rounded-[16px] border border-white/5 relative flex items-center justify-center overflow-hidden shadow-md">
         <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
         
@@ -32,7 +31,6 @@ const VideoPanel = ({
         </div>
       </div>
       
-      {/* Local Participant stream */}
       <div className="flex-1 bg-surface rounded-[16px] border border-white/5 relative flex items-center justify-center overflow-hidden shadow-md">
         <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
         

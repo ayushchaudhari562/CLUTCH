@@ -72,12 +72,28 @@ export const useWebRTC = (roomId) => {
   useEffect(() => {
     if (localStream && peerConnectionRef.current) {
       const senders = peerConnectionRef.current.getSenders();
+      let tracksAdded = false;
+      
       localStream.getTracks().forEach((track) => {
-        const trackAlreadyAdded = senders.some((sender) => sender.track === track);
+        const trackAlreadyAdded = senders.some((sender) => sender.track && sender.track.kind === track.kind);
         if (!trackAlreadyAdded) {
           peerConnectionRef.current.addTrack(track, localStream);
+          tracksAdded = true;
         }
       });
+
+      if (tracksAdded && peerConnectionRef.current.signalingState === "stable") {
+        const renegotiate = async () => {
+          try {
+            const offer = await peerConnectionRef.current.createOffer();
+            await peerConnectionRef.current.setLocalDescription(offer);
+            socket.emit("webrtc-offer", { roomId, offer });
+          } catch (e) {
+            console.error(e);
+          }
+        };
+        renegotiate();
+      }
     }
   }, [localStream]);
 
@@ -142,7 +158,10 @@ export const useWebRTC = (roomId) => {
     });
 
     socket.on("webrtc-offer", async ({ offer }) => {
-      const pc = createPeerConnection();
+      let pc = peerConnectionRef.current;
+      if (!pc) {
+        pc = createPeerConnection();
+      }
       
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       
