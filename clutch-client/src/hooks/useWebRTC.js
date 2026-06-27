@@ -340,12 +340,10 @@ export const useWebRTC = (roomId) => {
     socket.on("webrtc-ice-candidate", async ({ candidate }) => {
       // Jab bhi samne wale browser ko naya IP/rasta milta hai wo mujhe bhejta hai.
       // Main usko apne connection me add kar leta hu taki best path find karke connection ban jaye.
-      if (peerConnectionRef.current) {
-        if (peerConnectionRef.current.remoteDescription) {
-          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
-        } else {
-          iceCandidateQueue.current.push(candidate);
-        }
+      if (peerConnectionRef.current && peerConnectionRef.current.remoteDescription) {
+        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      } else {
+        iceCandidateQueue.current.push(candidate);
       }
     });
 
