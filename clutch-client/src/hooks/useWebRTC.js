@@ -15,6 +15,7 @@ export const useWebRTC = (roomId) => {
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [incomingCall, setIncomingCall] = useState(null);
+  const [remoteUser, setRemoteUser] = useState(null); // Added to track remote user for making calls
 
   //..
   //..
@@ -37,13 +38,18 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   const peerConnectionRef = useRef(null);
+  
+  // Refs for tracking call state without causing re-renders or stale closures
+  const pendingOffer = useRef(null);
+  const remoteUserRef = useRef(null);
+  const iceCandidateQueue = useRef([]); 
 
   //..
   //..
   // STUN Server Config: Yeh Google ka free server hai jo humein apna Public IP dhoondhne me madad karega (ICE Candidates banayega)
   //..
   //..
-  const rtcConfigiceServers = {
+  const rtcConfig = {
     iceServers: [
       {
         urls: "stun:stun.l.google.com:19302",
@@ -123,6 +129,20 @@ export const useWebRTC = (roomId) => {
     }
   };
 
+  // 4. Fix race conditions involving localStream: 
+  // Ensure tracks are added only after local media is available, in case stream loads late.
+  useEffect(() => {
+    if (localStream && peerConnectionRef.current) {
+      const senders = peerConnectionRef.current.getSenders();
+      localStream.getTracks().forEach((track) => {
+        const trackAlreadyAdded = senders.some((sender) => sender.track === track);
+        if (!trackAlreadyAdded) {
+          peerConnectionRef.current.addTrack(track, localStream);
+        }
+      });
+    }
+  }, [localStream]);
+
   //..
   //..
   // 3. THE CORE CONNECTION ENGINE
@@ -130,13 +150,17 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   const createPeerConnection = () => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
+
     //..
     //..
     // STUN server configuration use karke naya RTCPeerConnection object banaya
     // Yeh humara main engine hai jo dusre person se directly connect karega
     //..
     //..
-    const pc = new RTCPeerConnection(rtcConfigiceServers);
+    const pc = new RTCPeerConnection(rtcConfig);
 
     //..
     //..
@@ -194,8 +218,21 @@ export const useWebRTC = (roomId) => {
   // 4. USER ACTIONS (Accepting/Rejecting Calls)
   //..
   //..
+
+  const makeCall = async (targetId) => {
+    const pc = createPeerConnection();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    
+    socket.emit("webrtc-offer", {
+      targetSocketId: targetId,
+      offer,
+      roomId,
+    });
+  };
+
   const acceptCall = async () => {
-    if (!incomingCall) return;
+    if (!incomingCall || !pendingOffer.current) return;
     
     //..
     //..
@@ -204,31 +241,42 @@ export const useWebRTC = (roomId) => {
     //..
     const pc = createPeerConnection();
     
-    //..
-    //..
-    // 'Offer' banaya ki hum call karne ke liye ready hain aur humari details yeh hain
-    //..
-    //..
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+    await pc.setRemoteDescription(new RTCSessionDescription(pendingOffer.current));
+    
+    iceCandidateQueue.current.forEach((candidate) => {
+      pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+    });
+    iceCandidateQueue.current = [];
+
+    const answer = await pc.createAnswer();
     
     //..
     //..
-    // Socket se samne wale ko apna Offer bhej diya
+    // Apne answer ko apna "Local Description" set kar raha hu
     //..
     //..
-    socket.emit("webrtc-offer", {
-      targetSocketId: incomingCall,
-      offer,
+    await pc.setLocalDescription(answer);
+    
+    // 1. emit the Answer
+    //..
+    //..
+    // Answer wapas socket ke through usko bhej raha hu
+    //..
+    //..
+    socket.emit("webrtc-answer", {
       roomId,
+      answer,
     });
+    
     setIncomingCall(null);
+    pendingOffer.current = null;
   };
 
   const rejectCall = () => {
     if (!incomingCall) return;
     socket.emit("reject-call", { targetSocketId: incomingCall });
     setIncomingCall(null);
+    pendingOffer.current = null;
   };
 
   //..
@@ -245,7 +293,12 @@ export const useWebRTC = (roomId) => {
     //..
     socket.on("user-joined", (userID) => {
       // console.log("remote user joined: ", userID);
-      setIncomingCall(userID);
+      setRemoteUser(userID);
+      remoteUserRef.current = userID;
+      
+      // Automatically send an offer to the user who just joined!
+      // This will trigger their IncomingCallModal popup automatically.
+      makeCall(userID);
     });
 
     //..
@@ -253,23 +306,10 @@ export const useWebRTC = (roomId) => {
     // Signal 2: Kisi aur ne mujhe Offer (call request) bheja hai.
     //..
     //..
-    socket.on("webrtc-offer", async ({ offer }) => {
-      // console.log("Received an offer, creating answer");
-      
-      // Main apna connection engine ready kar raha hu
-      const pc = createPeerConnection();
-      
-      // Unki aayi hui details (Remote Description) apne engine me daal raha hu
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      
-      // Ab main apna 'Answer' banaunga
-      const answer = await pc.createAnswer();
-      
-      // Apne answer ko apna "Local Description" set kar raha hu
-      await pc.setLocalDescription(answer);
-      
-      // Answer wapas socket ke through usko bhej raha hu
-      socket.emit("webrtc-answer", { roomId, answer });
+    socket.on("webrtc-offer", async (payload) => {
+      // 2. Redesign signaling flow: "User B receives Offer -> Show Incoming Call popup"
+      pendingOffer.current = payload.offer;
+      setIncomingCall(payload.senderId || remoteUserRef.current || "Caller");
     });
 
     //..
@@ -283,6 +323,12 @@ export const useWebRTC = (roomId) => {
       // Agar mera connection abhi zinda hai, toh unka answer "Remote Description" me set kar dunga
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+        
+        // 5. Add queued ICE candidates now that remote description is set
+        iceCandidateQueue.current.forEach((candidate) => {
+          peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+        });
+        iceCandidateQueue.current = [];
       }
     });
 
@@ -295,7 +341,11 @@ export const useWebRTC = (roomId) => {
       // Jab bhi samne wale browser ko naya IP/rasta milta hai wo mujhe bhejta hai.
       // Main usko apne connection me add kar leta hu taki best path find karke connection ban jaye.
       if (peerConnectionRef.current) {
-        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        if (peerConnectionRef.current.remoteDescription) {
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } else {
+          iceCandidateQueue.current.push(candidate);
+        }
       }
     });
 
@@ -306,10 +356,17 @@ export const useWebRTC = (roomId) => {
     //..
     socket.on("call-rejected", () => {
       alert("Call was rejected");
+      setIncomingCall(null);
+      pendingOffer.current = null;
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+        peerConnectionRef.current = null;
+      }
       navigate("/");
     });
 
     return () => {
+      // 6. Keep proper cleanup
       // Cleanup function: Jab main room leave karu, toh saare listener hata dunga warna memory leak hoga.
       socket.off("user-joined");
       socket.off("webrtc-offer");
@@ -322,7 +379,7 @@ export const useWebRTC = (roomId) => {
         peerConnectionRef.current = null;
       }
     };
-  }, [roomId, localStream, navigate]);
+  }, [roomId, navigate]);
 
   //..
   //..
@@ -337,10 +394,12 @@ export const useWebRTC = (roomId) => {
     isVideoEnabled,
     isAudioEnabled,
     incomingCall,
+    remoteUser,
     localVideoRef,
     remoteVideoRef,
     toggleVideo,
     toggleAudio,
+    makeCall,
     acceptCall,
     rejectCall
   };

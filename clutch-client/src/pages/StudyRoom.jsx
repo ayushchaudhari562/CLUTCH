@@ -63,7 +63,7 @@ const StudyRoom = () => {
 
   return (
     <div className="h-screen bg-background text-white p-4 font-sans flex flex-col gap-4 overflow-hidden pt-4">
-      
+
       {/* Top Header Session Bar */}
       <div className="flex justify-between items-center bg-surface px-6 py-3.5 rounded-[16px] border border-white/5 shadow-md shrink-0">
         <div className="flex items-center gap-3">
@@ -75,16 +75,15 @@ const StudyRoom = () => {
             <p className="text-[10px] text-slate-400 font-medium">42 mins • CN ↔ DBMS swap</p>
           </div>
         </div>
-        
+
         {/* Controls (Meet style circle triggers) */}
         <div className="flex items-center gap-2.5">
-          <button 
-            onClick={toggleAudio} 
-            className={`p-2.5 rounded-full transition-all cursor-pointer border ${
-              isAudioEnabled 
-                ? "bg-google-blue/10 border-google-blue/20 text-google-blue hover:bg-google-blue/20" 
+          <button
+            onClick={toggleAudio}
+            className={`p-2.5 rounded-full transition-all cursor-pointer border ${isAudioEnabled
+                ? "bg-google-blue/10 border-google-blue/20 text-google-blue hover:bg-google-blue/20"
                 : "bg-google-red/10 border-google-red/20 text-google-red hover:bg-google-red/20"
-            }`}
+              }`}
             title={isAudioEnabled ? "Mute Microphone" : "Unmute Microphone"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
@@ -95,14 +94,13 @@ const StudyRoom = () => {
               )}
             </svg>
           </button>
-          
-          <button 
-            onClick={toggleVideo} 
-            className={`p-2.5 rounded-full transition-all cursor-pointer border ${
-              isVideoEnabled 
-                ? "bg-google-blue/10 border-google-blue/20 text-google-blue hover:bg-google-blue/20" 
+
+          <button
+            onClick={toggleVideo}
+            className={`p-2.5 rounded-full transition-all cursor-pointer border ${isVideoEnabled
+                ? "bg-google-blue/10 border-google-blue/20 text-google-blue hover:bg-google-blue/20"
                 : "bg-google-red/10 border-google-red/20 text-google-red hover:bg-google-red/20"
-            }`}
+              }`}
             title={isVideoEnabled ? "Disable Camera" : "Enable Camera"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
@@ -113,9 +111,9 @@ const StudyRoom = () => {
               )}
             </svg>
           </button>
-          
-          <button 
-            onClick={handleEndCall} 
+
+          <button
+            onClick={handleEndCall}
             className="ml-2 bg-google-red hover:bg-google-red/90 text-white text-xs px-5 py-2.5 rounded-full font-bold transition cursor-pointer border-0 shadow-md"
           >
             End Call
@@ -131,7 +129,7 @@ const StudyRoom = () => {
 
       {/* Main Content Split Area */}
       <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
-        
+
         {/* Left Panel: Whiteboard */}
         <Whiteboard roomId={roomId} />
 
@@ -148,8 +146,8 @@ const StudyRoom = () => {
         </div>
 
         {/* Right Panel: Video & Chat */}
-        <div 
-          style={{ width: `${sidebarWidth}px` }} 
+        <div
+          style={{ width: `${sidebarWidth}px` }}
           className="flex flex-col gap-4 shrink-0 transition-[width] duration-75 ease-out min-h-0"
         >
           <VideoPanel
