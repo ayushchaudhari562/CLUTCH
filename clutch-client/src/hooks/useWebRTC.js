@@ -37,6 +37,7 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   const peerConnectionRef = useRef(null);
+  const localStreamPromiseRef = useRef(null);
 
   //..
   //..
@@ -58,22 +59,20 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   useEffect(() => {
-    let activeStream = null;
-    const getMedia = async () => {
-      try {
-        //..
+       //..
         //..
         // Browser se camera aur microphone ki permission mangta hai. 
         // Agar user 'Allow' karta hai, toh return mein live 'stream' milta hai.
         //..
         //..
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        
-        //..
+          //..
         //..
         // Is stream ko state mein save kar rahe hain taaki baad mein muting/unmuting mein use kar sakein
         //..
         //..
+    let activeStream = null;
+    localStreamPromiseRef.current = navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
         activeStream = stream;
         setLocalStream(stream);
         
@@ -85,16 +84,12 @@ export const useWebRTC = (roomId) => {
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
-      } catch (err) {
-        //..
-        //..
-        // Agar user permission 'Deny' kar de ya camera kharab ho toh error aayega
-        //..
-        //..
-        console.log(err);
-      }
-    };
-    getMedia();
+        return stream;
+      })
+      .catch(err => {
+        console.log("Error getting media: ", err);
+        return null;
+      });
 
     return () => {
       if (activeStream) {
@@ -126,27 +121,24 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   // 3. THE CORE CONNECTION ENGINE
-  // Yeh function naya peer-to-peer connection banata hai do browsers ke beech
+    // Yeh function naya peer-to-peer connection banata hai do browsers ke beech
   //..
-  //..
-  const createPeerConnection = () => {
-    //..
+  //..  //..
     //..
     // STUN server configuration use karke naya RTCPeerConnection object banaya
     // Yeh humara main engine hai jo dusre person se directly connect karega
     //..
     //..
+  const createPeerConnection = async () => {
     const pc = new RTCPeerConnection(rtcConfigiceServers);
-
-    //..
-    //..
+ //..
     // Apna local camera/mic ka data (video & audio tracks) is connection mein feed kar rahe hain
     // Taki humara video network pe dusre person tak pahunch sake
     //..
-    //..
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
+    const stream = await localStreamPromiseRef.current;
+    if (stream) {
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
       });
     }
 
@@ -197,12 +189,7 @@ export const useWebRTC = (roomId) => {
   const acceptCall = async () => {
     if (!incomingCall) return;
     
-    //..
-    //..
-    // Engine start kiya
-    //..
-    //..
-    const pc = createPeerConnection();
+    const pc = await createPeerConnection();
     
     //..
     //..
@@ -255,11 +242,7 @@ export const useWebRTC = (roomId) => {
     //..
     socket.on("webrtc-offer", async ({ offer }) => {
       // console.log("Received an offer, creating answer");
-      
-      // Main apna connection engine ready kar raha hu
-      const pc = createPeerConnection();
-      
-      // Unki aayi hui details (Remote Description) apne engine me daal raha hu
+      const pc = await createPeerConnection();
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       
       // Ab main apna 'Answer' banaunga
@@ -292,10 +275,12 @@ export const useWebRTC = (roomId) => {
     //..
     //..
     socket.on("webrtc-ice-candidate", async ({ candidate }) => {
-      // Jab bhi samne wale browser ko naya IP/rasta milta hai wo mujhe bhejta hai.
-      // Main usko apne connection me add kar leta hu taki best path find karke connection ban jaye.
       if (peerConnectionRef.current) {
-        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        try {
+            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+            console.error("Error adding ICE candidate:", e);
+        }
       }
     });
 
@@ -322,7 +307,7 @@ export const useWebRTC = (roomId) => {
         peerConnectionRef.current = null;
       }
     };
-  }, [roomId, localStream, navigate]);
+  }, [roomId, navigate]);
 
   //..
   //..
