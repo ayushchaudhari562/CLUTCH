@@ -15,7 +15,7 @@ export const useWebRTC = (roomId) => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
-  const iceCandidateQueue = useRef([]); 
+  const iceCandidateQueue = useRef([]);
   const localStreamRef = useRef(null);
 
   const rtcConfig = {
@@ -33,7 +33,7 @@ export const useWebRTC = (roomId) => {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         activeStream = stream;
         setLocalStream(stream);
-        
+
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
@@ -78,7 +78,7 @@ export const useWebRTC = (roomId) => {
   useEffect(() => {
     if (localStream && peerConnectionRef.current) {
       const senders = peerConnectionRef.current.getSenders();
-      
+
       localStream.getTracks().forEach((track) => {
         const trackAlreadyAdded = senders.some((sender) => sender.track && sender.track.kind === track.kind);
         if (!trackAlreadyAdded) {
@@ -124,24 +124,24 @@ export const useWebRTC = (roomId) => {
 
   const acceptCall = async () => {
     if (!incomingCall) return;
-    
+
     // Wait for the camera to be ready before initiating the call (up to 5 seconds)
     let attempts = 0;
     while (!localStreamRef.current && attempts < 50) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
     }
-    
+
     const pc = createPeerConnection();
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-    
+
     socket.emit("webrtc-offer", {
       targetSocketId: incomingCall,
       offer,
       roomId,
     });
-    
+
     setIncomingCall(null);
   };
 
@@ -168,9 +168,9 @@ export const useWebRTC = (roomId) => {
       if (!pc) {
         pc = createPeerConnection();
       }
-      
+
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      
+
       iceCandidateQueue.current.forEach((candidate) => {
         pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
       });
@@ -178,7 +178,7 @@ export const useWebRTC = (roomId) => {
 
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      
+
       socket.emit("webrtc-answer", {
         roomId,
         answer,
@@ -188,7 +188,7 @@ export const useWebRTC = (roomId) => {
     socket.on("webrtc-answer", async ({ answer }) => {
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-        
+
         iceCandidateQueue.current.forEach((candidate) => {
           peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
         });
@@ -228,7 +228,7 @@ export const useWebRTC = (roomId) => {
     };
   }, [roomId, navigate]);
 
-  
+
   return {
     localStream,
     remoteStream,

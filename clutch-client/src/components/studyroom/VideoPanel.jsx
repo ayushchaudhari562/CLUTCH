@@ -1,4 +1,5 @@
 import React from 'react';
+// import {clerkClient} from '@clerk/clerk-react';
 
 const VideoPanel = ({
   remoteStream,
