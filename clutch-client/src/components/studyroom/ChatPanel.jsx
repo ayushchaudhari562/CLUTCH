@@ -40,16 +40,13 @@ const ChatPanel = ({ roomId }) => {
   useEffect(() => {
     const onConnect = () => {
       socketIdRef.current = socket.id;
-      if (roomId) {
-        socket.emit("join-room", roomId);
-      }
     };
     socket.on("connect", onConnect);
     if (socket.connected) {
       socketIdRef.current = socket.id;
     }
     return () => socket.off("connect", onConnect);
-  }, [roomId]);
+  }, []);
 
   useEffect(() => {
     msfEndRef.current?.scrollIntoView({ behavior: "smooth" });

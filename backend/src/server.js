@@ -4,8 +4,8 @@ const app = require("./app");
 
 const server = http.createServer(app);
 const io = new Server(server,{
-    pingInterval: 25000,
-    pingTimeout: 20000,
+    pingInterval: 10000,
+    pingTimeout: 5000,
     cors: {
         //...
         //..

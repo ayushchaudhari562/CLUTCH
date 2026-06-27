@@ -34,10 +34,6 @@ const Whiteboard = ({ roomId }) => {
       
       const mergedElements = Object.values(elementMap);
       excalidrawAPI.updateScene({ elements: mergedElements });
-      
-      setTimeout(() => {
-        isUpdatingFromSocket.current = false;
-      }, 50);
     };
 
     socket.on("excalidraw-update", handleExcalidrawUpdate);
@@ -50,6 +46,7 @@ const Whiteboard = ({ roomId }) => {
   const handleExcalidrawChange = (elements) => {
     // Stop the infinite loop! If the network just updated us, don't send it back.
     if (isUpdatingFromSocket.current) {
+      isUpdatingFromSocket.current = false;
       return;
     }
 
@@ -57,7 +54,8 @@ const Whiteboard = ({ roomId }) => {
 
     debounceTimer.current = setTimeout(() => {
       socket.emit("excalidraw-update", { roomId, elements });
-    }, 300); //BC yhi hota  hai Increased from 30ms to 300ms to prevent connection flooding
+      console.log("Emitted excalidraw-update to room:", roomId, "with elements:", elements);
+    }, 30);//ye imp hai for debugging
   };
 
   return (
