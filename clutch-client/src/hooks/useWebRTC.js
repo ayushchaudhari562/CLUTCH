@@ -37,6 +37,7 @@ export const useWebRTC = (roomId) => {
   //..
   //..
   const peerConnectionRef = useRef(null);
+  const iceCandidateQueue = useRef([]);
 
   //..
   //..
@@ -262,6 +263,12 @@ export const useWebRTC = (roomId) => {
       // Unki aayi hui details (Remote Description) apne engine me daal raha hu
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       
+      // Process queued candidates
+      while (iceCandidateQueue.current.length > 0) {
+        const candidate = iceCandidateQueue.current.shift();
+        await pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+      }
+      
       // Ab main apna 'Answer' banaunga
       const answer = await pc.createAnswer();
       
@@ -283,6 +290,12 @@ export const useWebRTC = (roomId) => {
       // Agar mera connection abhi zinda hai, toh unka answer "Remote Description" me set kar dunga
       if (peerConnectionRef.current) {
         await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+        
+        // Process queued candidates
+        while (iceCandidateQueue.current.length > 0) {
+          const candidate = iceCandidateQueue.current.shift();
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+        }
       }
     });
 
@@ -294,8 +307,14 @@ export const useWebRTC = (roomId) => {
     socket.on("webrtc-ice-candidate", async ({ candidate }) => {
       // Jab bhi samne wale browser ko naya IP/rasta milta hai wo mujhe bhejta hai.
       // Main usko apne connection me add kar leta hu taki best path find karke connection ban jaye.
-      if (peerConnectionRef.current) {
-        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      if (peerConnectionRef.current && peerConnectionRef.current.remoteDescription) {
+        try {
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error("Error adding ICE candidate:", e);
+        }
+      } else {
+        iceCandidateQueue.current.push(candidate);
       }
     });
 

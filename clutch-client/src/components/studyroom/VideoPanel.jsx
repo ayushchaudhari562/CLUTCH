@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const VideoPanel = ({
   remoteStream,
@@ -6,6 +6,20 @@ const VideoPanel = ({
   remoteVideoRef,
   localVideoRef
 }) => {
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+      remoteVideoRef.current.play().catch(console.error);
+    }
+  }, [remoteStream, remoteVideoRef]);
+
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.play().catch(console.error);
+    }
+  }, [localStream, localVideoRef]);
+
   return (
     <div className="flex gap-3 h-[180px] shrink-0">
       
