@@ -57,8 +57,7 @@ const Whiteboard = ({ roomId }) => {
 
     debounceTimer.current = setTimeout(() => {
       socket.emit("excalidraw-update", { roomId, elements });
-      console.log("Emitted excalidraw-update to room:", roomId, "with elements:", elements);
-    }, 30);//ye imp hai for debugging
+    }, 300); //BC yhi hota  hai Increased from 30ms to 300ms to prevent connection flooding
   };
 
   return (
